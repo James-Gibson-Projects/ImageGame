@@ -1,7 +1,10 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
-    kotlin("multiplatform") version "1.5.31"
+    kotlin("multiplatform") version "1.7.10"
+    kotlin("kapt") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
+    id("org.jetbrains.compose") version "1.2.0"
     application
 }
 
@@ -10,7 +13,13 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven") }}
+    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven") }
+    maven {
+        url = uri("https://plugins.gradle.org/m2/")
+    }
+    maven("https://jitpack.io/")
+}
+
 
 // JVM
 val ktorVersion: String by project
@@ -44,22 +53,73 @@ kotlin {
         }
     }
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting{
+            dependencies{
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+                implementation("io.insert-koin:koin-core:3.2.2")
+
+            }
+        }
         val commonTest by getting
         val jvmMain by getting {
             dependencies {
+                implementation(compose.web.core)
+                implementation(compose.runtime)
+
                 implementation("io.ktor:ktor-server-jetty:$ktorVersion")
-                implementation("io.ktor:ktor-html-builder:$ktorVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinxHtmlVersion")
                 implementation("org.slf4j:slf4j-api:$slf4jVersion")
                 runtimeOnly("org.slf4j:slf4j-simple:$slf4jVersion")
+
+                implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
+                implementation("io.ktor:ktor-server-host-common-jvm:$ktorVersion")
+                implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
+                implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+                implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
+                implementation("io.ktor:ktor-server-sessions:$ktorVersion")
+                implementation("io.ktor:ktor-server-auth:$ktorVersion")
+                implementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
+                implementation("io.ktor:ktor-server-websockets:$ktorVersion")
+                implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+
+                implementation("io.insert-koin:koin-ktor:3.2.2")
+                implementation("io.insert-koin:koin-logger-slf4j:3.2.2")
+
+                implementation("org.mindrot:jbcrypt:0.4")
+
+                implementation("com.natpryce:konfig:1.6.10.0")
+
+                implementation("com.github.mnbjhu.KotlinRedisGraph:core:0.8.13")
+
+                configurations.getByName("kapt").dependencies.add(
+                    org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency(
+                        "com.github.mnbjhu.KotlinRedisGraph",
+                        "annotations",
+                        "0.8.13"
+                    )
+                )
+
+
+
             }
         }
         val jvmTest by getting
         val jsMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-html:$kotlinxHtmlVersion")
+                implementation(compose.web.core)
+                implementation(compose.runtime)
+                implementation("app.softwork:routing-compose:0.2.7")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-client-websockets:$ktorVersion")
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-extensions:1.0.1-pre.256-kotlin-1.5.31")
+                implementation("io.ktor:ktor-client-js:$ktorVersion")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-html:$kotlinxHtmlVersion")
+
                 implementation(npm("postcss", postcssVersion))
                 implementation(npm("postcss-loader", postcssLoaderVersion)) // 5.0.0 seems not to work
                 implementation(npm("autoprefixer", autoprefixerVersion))
