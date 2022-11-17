@@ -1,7 +1,7 @@
 package data.repo
 
 import data.database.Remote
-import domain.repos.InviteRepo
+import domain.repos.FriendRequestRepo
 import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
 import io.ktor.websocket.*
@@ -15,28 +15,28 @@ import model.InvitationsState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class InviteRepoImpl: InviteRepo, KoinComponent {
+class FriendRequestRepoImpl: FriendRequestRepo, KoinComponent {
     private val scope = MainScope()
     private val remote by inject<Remote>()
     private var session: DefaultClientWebSocketSession? = null
 
     private val launchJob = MainScope().async {
-            session = remote.client.webSocketSession(
-                method = HttpMethod.Get,
-                host = "192.168.1.118",
-                port = 8080,
-                path = "/api/invites"
-            )
-        }
+        session = remote.client.webSocketSession(
+            method = HttpMethod.Get,
+            host = "192.168.1.118",
+            port = 8080,
+            path = "/api/friend_requests"
+        )
+    }
 
     override fun inviteUser(username: String) { scope.launch {
         try{ session!!.send(username) } catch (e: Exception) { println(e.stackTraceToString()) }
 
     } }
     override fun acceptInvite(username: String) { scope.launch { session!!.send(username) } }
-    override fun observeNotifications(): Flow<InvitationsState> {
+    override fun observeFriendRequest(): Flow<List<String>> {
         return flow {
-            emit(InvitationsState(emptyList(), emptyList()))
+            emit(emptyList())
             launchJob.await()
             try{
                 emitAll(session!!.incoming.receiveAsFlow()

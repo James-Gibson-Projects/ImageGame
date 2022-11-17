@@ -10,18 +10,16 @@ import org.koin.core.component.inject
 
 class UserRepoImpl: UserRepo, KoinComponent {
     private val remote by inject<Remote>()
-    override suspend fun login(details: UserCredentials): Boolean {
-        val response = remote.client.post("/api/login") {
+    override suspend fun login(details: UserCredentials){
+        remote.client.post("/api/login") {
             contentType(ContentType.Application.Json)
             setBody(details)
         }
-        return response.status == HttpStatusCode.OK
     }
-    override suspend fun register(details: UserCredentials): Boolean {
-        val response = remote.client.post("/api/register") {
+    override suspend fun register(details: UserCredentials){
+        remote.client.post("/api/register") {
             contentType(ContentType.Application.Json)
             setBody(details)
         }
-        return response.status == HttpStatusCode.OK
     }
 }

@@ -2,7 +2,13 @@ package presentation.views
 
 
 import androidx.compose.runtime.*
+import app.softwork.routingcompose.NavLink
+import app.softwork.routingcompose.Router
 import org.jetbrains.compose.web.dom.*
+import presentation.components.DefaultButton
+import presentation.components.DefaultPasswordField
+import presentation.components.DefaultTextField
+import presentation.components.LoginLayout
 import presentation.view_models.LoginViewModel
 import presentation.view_models.RegistrationViewModel
 
@@ -10,17 +16,24 @@ import presentation.view_models.RegistrationViewModel
 fun RegistrationView(viewModel: RegistrationViewModel){
     var username by remember{ viewModel.usernameState }
     var password by remember{ viewModel.passwordState }
-    Div {
-        TextInput(username){
-            onInput { username = it.value }
+    var signupFailed by remember { viewModel.signupFailedState }
+    LoginLayout{
+        Div(attrs = { classes("-space-y-px rounded-md shadow-sm".split(" ")) }) {
+            DefaultTextField(username, "Username", "username") { username = it }
+            DefaultPasswordField(password, "password") { password = it }
         }
-        Br()
-        PasswordInput(password){
-            onInput { password = it.value }
+        DefaultButton("Sign-Up", color = "green") { viewModel.register() }
+        if(signupFailed) Div(attrs = { classes("text-red-500") }){
+            Text("Failed To sign-up...")
         }
-        Br()
-        Button({ onClick { viewModel.register() } }){
-            Text("Register")
+        Div({classes("flex", "flex-row", "gap-2")}){
+            Text("Already have an account? ")
+            NavLink(
+                to = "/login",
+                attrs = { classes("text-blue-800", "hover:underline") }
+            ){
+                Text("Login Here")
+            }
         }
     }
 }

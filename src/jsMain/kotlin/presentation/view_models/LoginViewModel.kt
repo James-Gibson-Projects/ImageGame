@@ -1,25 +1,26 @@
 package presentation.view_models
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
 import app.softwork.routingcompose.Router
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import domain.repos.UserRepo
+import kotlinx.coroutines.*
 import model.UserCredentials
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import presentation.use_cases.UserLoginUseCases
 
 class LoginViewModel(private val router: Router): KoinComponent {
-    private val useCases by inject<UserLoginUseCases>()
-    private val scope = MainScope()
-    var usernameState = mutableStateOf("")
-    var passwordState = mutableStateOf("")
+    private val repo by inject<UserRepo>()
+    private val handler = CoroutineExceptionHandler { _, e -> loginFailedState.value = true }
+    private val scope = MainScope() + handler
+    val usernameState = mutableStateOf("")
+    val passwordState = mutableStateOf("")
+    val loginFailedState = mutableStateOf(false)
     fun login(){
         scope.launch {
-            useCases.login(
-                UserCredentials(usernameState.value, passwordState.value),
-                router
-            )
+            withContext(Dispatchers.Default) {
+                repo.login(UserCredentials(usernameState.value, passwordState.value))
+            }
+            router.navigate("/home")
         }
     }
 }

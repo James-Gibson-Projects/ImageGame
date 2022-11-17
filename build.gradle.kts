@@ -81,7 +81,6 @@ kotlin {
                 implementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
                 implementation("io.ktor:ktor-server-websockets:$ktorVersion")
                 implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-
                 implementation("io.insert-koin:koin-ktor:3.2.2")
                 implementation("io.insert-koin:koin-logger-slf4j:3.2.2")
 
@@ -89,13 +88,13 @@ kotlin {
 
                 implementation("com.natpryce:konfig:1.6.10.0")
 
-                implementation("com.github.mnbjhu.KotlinRedisGraph:core:0.8.13")
+                implementation("com.github.mnbjhu.KotlinRedisGraph:core:0.9.2")
 
                 configurations.getByName("kapt").dependencies.add(
                     org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency(
                         "com.github.mnbjhu.KotlinRedisGraph",
                         "annotations",
-                        "0.8.13"
+                        "0.9.2"
                     )
                 )
 
@@ -109,6 +108,7 @@ kotlin {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
                 implementation("app.softwork:routing-compose:0.2.7")
+                implementation("org.jetbrains.compose.web:web-svg-js:1.2.0")
 
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
