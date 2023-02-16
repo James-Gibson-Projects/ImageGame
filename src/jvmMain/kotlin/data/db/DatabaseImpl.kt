@@ -2,8 +2,8 @@ package net.malkowscy.application.data.db
 
 import data.db.Database
 import uk.gibby.redis.core.RedisGraph
-import net.malkowscy.application.util.Config
-import net.malkowscy.application.util.config
+import util.Config
+import util.config
 
 class DatabaseImpl: Database {
     override val graph = RedisGraph(
