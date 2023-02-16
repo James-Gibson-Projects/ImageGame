@@ -1,6 +1,6 @@
 package routes.plugins
 
-import data.db.schema.UserSession
+import domain.model.UserSession
 import domain.repo.UserRepo
 import io.ktor.server.auth.*
 import io.ktor.server.sessions.*

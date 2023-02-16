@@ -1,7 +1,7 @@
 package data.repo
 
-import data.db.schema.UserSession
 import domain.exceptions.UserNotFoundException
+import domain.model.UserSession
 import domain.repo.FriendRepo
 import domain.repo.FriendWebsocketRepo
 import io.ktor.server.application.*

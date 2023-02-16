@@ -1,6 +1,7 @@
 package domain.repo
 
-import data.db.schema.UserSession
+import domain.model.UserSession
+
 
 interface UserRepo {
     fun createUser(name: String, pass: String): UserSession?

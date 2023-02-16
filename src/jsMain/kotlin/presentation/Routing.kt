@@ -22,7 +22,8 @@ class AppRoot{
         HashRouter("/login") {
             val router = Router.current
             route("/home") {
-                HomeView(FriendsViewModel())
+                // HomeView(FriendsViewModel())
+                HomeView()
             }
             route("/board"){ BoardView() }
             route("/register") {

@@ -1,5 +1,6 @@
 package routes.plugins
 
+import domain.model.UserSession
 import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -7,7 +8,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.serialization.json.Json
-import data.db.schema.UserSession
 import domain.repo.FriendWebsocketRepo
 import org.koin.ktor.ext.inject
 import routes.web_sockets.Connection

@@ -1,4 +1,4 @@
-package net.malkowscy.application.domain.repo
+package domain.repo
 
 interface InviteRepo{
     fun sendInvite(fromUsername: String, toUsername: String)

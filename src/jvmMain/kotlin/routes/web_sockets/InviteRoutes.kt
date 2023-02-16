@@ -5,11 +5,11 @@ import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import data.db.schema.UserSession
 import domain.exceptions.InviteAlreadySentException
 import domain.exceptions.SelfInviteException
 import domain.exceptions.UserNotFoundException
-import net.malkowscy.application.domain.repo.InviteRepo
+import domain.model.UserSession
+import domain.repo.InviteRepo
 import model.InvitationsState
 import org.koin.ktor.ext.inject
 import java.util.*

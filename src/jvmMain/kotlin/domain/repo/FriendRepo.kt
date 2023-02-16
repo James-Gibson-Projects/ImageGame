@@ -1,8 +1,8 @@
 package domain.repo
 
-import data.db.schema.UserLastOnline
+import domain.model.UserWithStatus
 
 interface FriendRepo {
-    fun getFriends(username: String): List<UserLastOnline>
+    fun getFriends(username: String): List<UserWithStatus>
     fun deleteFriendship(firstUsername: String, secondUsername: String)
 }

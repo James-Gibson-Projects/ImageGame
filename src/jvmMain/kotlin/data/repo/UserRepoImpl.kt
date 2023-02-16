@@ -1,85 +1,76 @@
 package data.repo
-import data.db.Database
-import data.db.schema.UserSession
-import data.db.schema.createSession
-import data.db.schema.updateSession
-import domain.repo.FriendWebsocketRepo
+
+import data.db.Neo4jDatabase
+import data.db.schema.AuthenticatedBy
+import data.db.schema.UserNode
+import data.db.schema.UserSessionNode
+import domain.model.UserSession
 import domain.repo.UserRepo
+import io.ktor.server.sessions.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.mindrot.jbcrypt.BCrypt
-import uk.gibby.redis.conditions.equality.eq
-import uk.gibby.redis.core.invoke
-import uk.gibby.redis.generated.UserNode
-import uk.gibby.redis.generated.UserSessionNode
-import uk.gibby.redis.paths.minus
-import uk.gibby.redis.results.get
-import uk.gibby.redis.statements.Create.Companion.create
-import uk.gibby.redis.statements.Delete.Companion.delete
-import uk.gibby.redis.statements.Match.Companion.match
-import uk.gibby.redis.statements.OrderBy.Companion.orderByDesc
-import uk.gibby.redis.statements.Skip.Companion.skip
-import uk.gibby.redis.statements.Where.Companion.where
-import uk.gibby.redis.statements.WithAs.Companion.using
+import uk.gibby.neo4k.clauses.Create.Companion.create
+import uk.gibby.neo4k.clauses.DetachDelete.Companion.detachDelete
+import uk.gibby.neo4k.clauses.Match.Companion.match
+import uk.gibby.neo4k.core.Graph
+import uk.gibby.neo4k.core.invoke
+import uk.gibby.neo4k.paths.`o-→`
+import uk.gibby.neo4k.paths.`←-o`
+import uk.gibby.neo4k.queries.build
+import uk.gibby.neo4k.queries.query
+import uk.gibby.neo4k.returns.primitives.StringReturn
 
-class UserRepoImpl(database: Database): UserRepo, KoinComponent {
-    val websocketRepo: FriendWebsocketRepo by inject()
-    private val graph = database.graph
+class UserRepoImpl : UserRepo, KoinComponent{
+    val graph: Graph
+    init {
+        val db by inject<Neo4jDatabase>()
+        graph = db.graph
+    }
     override fun createUser(name: String, pass: String): UserSession? {
-        return if(graph.query { match(::UserNode{ it[username] = name }) }.isEmpty()){
-            graph.query {
-                val userNode = create(::UserNode{ it[username] = name; it[passwordHash] = hash(pass) })
-                val userRef = using(userNode)
-                val session = createSession(userRef)
-                session
-            }.first()
-        } else null
+        val salt = BCrypt.gensalt()
+        val passwordHash = BCrypt.hashpw(pass, salt)
+        val user = graph.createUser(name, passwordHash).first()
+        return graph.createSession(user.username, generateSessionId()).firstOrNull()
     }
+
     override suspend fun loginUser(name: String, password: String): UserSession? {
-        val hash = graph.query {
-            match(::UserNode{ it[username] = name }).passwordHash
-        }.firstOrNull()
-        return hash?.let {
-            if(!BCrypt.checkpw(password, it)) return null
-            graph.query {
-                val user = match(::UserNode{ it[username] = name })
-                val (_, _, oldSession) = match(user - { authorisedBy } - ::UserSessionNode)
-                delete(oldSession)
-            }
-            graph.query { createSession(using(match(::UserNode{ it[username] = name }))) }
-        }?.firstOrNull()
-            .also {
-                if(it != null){
-                    graph.query {
-                        val (_, otherUser, otherUserSession) = match(::UserNode{it[username] = name} - {friendsWith} - ::UserNode - {authorisedBy} - ::UserSessionNode).nodes()
-                        where(!(otherUserSession.key eq "IN_ACTIVE"))
-                        otherUser.username
-                    }.forEach { websocketRepo.updateUser(it) }
-                }
-            }
-    }
-    override fun logoutUser(session: UserSession){
-        graph.query {
-            delete(match(::UserSessionNode[session]))
+        return graph.findUser(name, password).firstOrNull()?.let {
+            graph.createSession(it.username, generateSessionId()).first()
         }
     }
-    override fun verifySession(session: UserSession) = graph.query {
-        val sessionNode = match(::UserSessionNode{
-            it[username] = session.username
-            it[key] = session.key
-        })
-        where(!(sessionNode.key eq "IN_ACTIVE"))
-        updateSession(sessionNode)
-    }.firstOrNull()
-    private fun deleteOldSessions(username: String) = graph.query {
-        val session = match(::UserSessionNode{it[this.username] = username})
-        orderByDesc(session.lastActive)
-        skip(1)
-        delete(session)
 
+    override fun logoutUser(session: UserSession) {
+        graph.logoutUser(session.username)
     }
-    companion object {
-        @JvmStatic
-        private fun hash(password: String) = BCrypt.hashpw(password, BCrypt.gensalt())
+
+    override fun verifySession(session: UserSession): UserSession? {
+        return graph.findSession(session.username, session.key).firstOrNull()
+    }
+
+
+    companion object{
+        val createUser = query(::StringReturn, ::StringReturn) { name, passHash ->
+            create(::UserNode{ it[username] = name; it[passwordHash] = passHash })
+        }.build()
+
+        val findUser = query(::StringReturn, ::StringReturn) { name, passHash ->
+            match(::UserNode{ it[username] = name; it[passwordHash] = passHash })
+        }.build()
+
+        val createSession = query(::StringReturn, ::StringReturn) { name, sessionId->
+            val user = match(::UserNode{ it[username] = name})
+            val (_, _, session) = create(user `o-→` ::AuthenticatedBy `o-→` ::UserSessionNode{ it[key] = sessionId; it[name] = user.username })
+            session
+        }.build()
+
+        val logoutUser = query(::StringReturn){ name ->
+            val (session) = match(::UserSessionNode `←-o` ::AuthenticatedBy `←-o` ::UserNode{ it[username] = name })
+            detachDelete(session)
+        }.build()
+
+        val findSession = query (::StringReturn, ::StringReturn){ name, key ->
+            match(::UserSessionNode{it[username] = name; it[this.key] = key})
+        }.build()
     }
 }

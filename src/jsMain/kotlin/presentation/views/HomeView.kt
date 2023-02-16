@@ -9,7 +9,6 @@ import presentation.components.SideBar
 import presentation.components.TopBar
 import presentation.view_models.FriendsViewModel
 
-/*
 @Composable
 fun HomeView(){
     NavLink("/register") { Text("Register") }
@@ -25,9 +24,10 @@ fun HomeView(){
     NavLink("/test") { Text("Test") }
 }
 
- */
+/*
 @Composable
 fun HomeView(friendsViewModel: FriendsViewModel){
     TopBar()
     SideBar(friendsViewModel)
 }
+ */

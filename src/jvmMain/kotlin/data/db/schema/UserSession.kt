@@ -1,30 +1,17 @@
 package data.db.schema
 
+import domain.model.UserSession
 import io.ktor.server.auth.*
-import io.ktor.server.sessions.*
-import uk.gibby.redis.annotation.Node
-import uk.gibby.redis.paths.minus
-import uk.gibby.redis.scopes.QueryScope
-import uk.gibby.redis.statements.Create.Companion.create
-import uk.gibby.redis.core.invoke
-import uk.gibby.redis.core.toValue
-import uk.gibby.redis.statements.Update.Companion.set
-import java.util.Date
+import uk.gibby.neo4k.returns.graph.entities.Node
+import uk.gibby.neo4k.returns.primitives.StringReturn
+import uk.gibby.neo4k.returns.util.ReturnScope
 
-
-fun QueryScope.createSession(user: UserNode): UserSessionNode{
-    val newSession = ::UserSessionNode{
-        it[username] = user.username
-        it[key] = generateSessionId()
-        it[lastActive] = Date().time
-    }
-    return create(user - {authorisedBy} - newSession).second
+data class UserSessionNode(
+    val username: StringReturn,
+    val key: StringReturn,
+): Node<UserSession>() {
+    override fun ReturnScope.decode() = UserSession(
+        ::username.result(),
+        ::key.result(),
+    )
 }
-
-fun QueryScope.updateSession(session: UserSessionNode): UserSessionNode{
-    set(session.lastActive toValue Date().time)
-    return session
-}
-
-
-

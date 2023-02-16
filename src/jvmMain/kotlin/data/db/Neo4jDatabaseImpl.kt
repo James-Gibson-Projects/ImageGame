@@ -9,6 +9,6 @@ class Neo4jDatabaseImpl : Neo4jDatabase {
         name = "main",
         host = config[Config.server_host],
         username = config[Config.server_user],
-        password = config[Config.server_host]
+        password = config[Config.server_pass]
     )
 }
