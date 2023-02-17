@@ -14,9 +14,11 @@ import routes.plugins.configureSecurity
 import routes.plugins.configureWebsockets
 import routes.plugins.configureSerialization
 import routes.plugins.configureTemplating
+import util.Config
+import util.config
 
 fun main() {
-    embeddedServer(Jetty, port = 8080, host = "192.168.1.118") {
+    embeddedServer(Jetty, port = 8080, host = config[Config.serverHost]) {
         install(Routing)
         configureKoin()
         configureSecurity()
