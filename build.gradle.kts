@@ -58,7 +58,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
                 implementation("io.insert-koin:koin-core:3.2.2")
-
             }
         }
         val commonTest by getting
@@ -102,7 +101,12 @@ kotlin {
 
             }
         }
-        val jvmTest by getting
+        val jvmTest by getting{
+            dependencies{
+                implementation("io.ktor:ktor-server-test-host:$ktorVersion")
+                implementation("org.amshove.kluent:kluent:1.72")
+            }
+        }
         val jsMain by getting {
             dependencies {
                 implementation(compose.web.core)

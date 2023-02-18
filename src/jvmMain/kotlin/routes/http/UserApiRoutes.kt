@@ -16,9 +16,6 @@ import org.koin.ktor.ext.inject
 fun Application.configureUserRoutes(){
     val repo by inject<UserRepo>()
     routing {
-        get("/") {
-            call.respondText("Hello World!")
-        }
         // Static plugin. Try to access `/static/index.html`
         static("/static") {
             resources("static")

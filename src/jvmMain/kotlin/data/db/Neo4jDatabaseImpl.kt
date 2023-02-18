@@ -10,5 +10,5 @@ class Neo4jDatabaseImpl : Neo4jDatabase {
         host = config[Config.server_host],
         username = config[Config.server_user],
         password = config[Config.server_pass]
-    )
+    ).also { it.create() }
 }

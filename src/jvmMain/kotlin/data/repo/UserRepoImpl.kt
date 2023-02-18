@@ -60,7 +60,7 @@ class UserRepoImpl : UserRepo, KoinComponent{
 
         val createSession = query(::StringReturn, ::StringReturn) { name, sessionId->
             val user = match(::UserNode{ it[username] = name})
-            val (_, _, session) = create(user `o-→` ::AuthenticatedBy `o-→` ::UserSessionNode{ it[key] = sessionId; it[name] = user.username })
+            val (_, _, session) = create(user `o-→` ::AuthenticatedBy `o-→` ::UserSessionNode{ it[key] = sessionId; it[username] = user.username })
             session
         }.build()
 
