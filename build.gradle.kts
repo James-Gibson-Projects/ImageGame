@@ -60,7 +60,12 @@ kotlin {
                 implementation("io.insert-koin:koin-core:3.2.2")
             }
         }
-        val commonTest by getting
+        val commonTest by getting{
+            dependencies{
+                implementation(kotlin("test"))
+                implementation("io.insert-koin:koin-test:3.2.2")
+            }
+        }
         val jvmMain by getting {
             dependencies {
                 implementation(compose.web.core)
@@ -104,6 +109,7 @@ kotlin {
         val jvmTest by getting{
             dependencies{
                 implementation("io.ktor:ktor-server-test-host:$ktorVersion")
+                implementation("io.insert-koin:koin-test-junit4:3.2.2")
                 implementation("org.amshove.kluent:kluent:1.72")
             }
         }
@@ -161,3 +167,6 @@ tasks.getByName<JavaExec>("run") {
 
 // Suppresses a "without declaring an explicit or implicit dependency" warning
 tasks.getByName("startScripts").dependsOn("metadataJar")
+tasks.test {
+    useJUnitPlatform()
+}
