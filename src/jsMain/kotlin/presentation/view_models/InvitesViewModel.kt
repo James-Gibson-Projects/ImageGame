@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import domain.repos.InviteRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import model.InvitationsState
+import model.messages.InvitationsState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

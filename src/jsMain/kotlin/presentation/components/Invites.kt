@@ -1,7 +1,7 @@
 package presentation.components
 
 import androidx.compose.runtime.*
-import model.InvitationsState
+import model.messages.InvitationsState
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Text

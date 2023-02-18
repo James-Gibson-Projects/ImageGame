@@ -10,7 +10,7 @@ import domain.exceptions.SelfInviteException
 import domain.exceptions.UserNotFoundException
 import domain.model.UserSession
 import domain.repo.InviteRepo
-import model.InvitationsState
+import model.messages.InvitationsState
 import org.koin.ktor.ext.inject
 import java.util.*
 

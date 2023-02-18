@@ -1,5 +1,6 @@
 package routes.http
 
+import domain.model.UserSession
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -20,11 +21,6 @@ fun Application.configureUserRoutes(){
         static("/static") {
             resources("static")
         }
-        authenticate("auth-session") {
-            get("/home"){
-                call.respond("You are logged in")
-            }
-        }
         post("/api/register"){
             val (username, password) = call.receive<UserCredentials>()
             val session = repo.createUser(username, password)
@@ -35,7 +31,14 @@ fun Application.configureUserRoutes(){
             val (username, password) = call.receive<UserCredentials>()
             val session = repo.loginUser(username, password)
             if(session != null) { call.sessions.set(session);  call.respond(HttpStatusCode.OK) }
-            else call.respond(HttpStatusCode.Conflict)
+            else call.respond(HttpStatusCode.Unauthorized)
+        }
+        authenticate("auth-session"){
+            get("/api/logout"){
+                val session = call.principal<UserSession>()
+                if(session != null) { repo.logoutUser(session);  call.respond(HttpStatusCode.OK) }
+                else call.respond(HttpStatusCode.Unauthorized)
+            }
         }
     }
 }

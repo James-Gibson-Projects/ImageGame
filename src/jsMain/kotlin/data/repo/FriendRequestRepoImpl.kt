@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import model.InvitationsState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

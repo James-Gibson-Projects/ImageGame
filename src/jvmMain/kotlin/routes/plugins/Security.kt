@@ -2,6 +2,7 @@ package routes.plugins
 
 import domain.model.UserSession
 import domain.repo.UserRepo
+import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.sessions.*
 import io.ktor.server.application.*
@@ -21,7 +22,7 @@ fun Application.configureSecurity() {
                 repo.verifySession(session)
             }
             challenge {
-                call.respondRedirect("/app/login")
+                call.respond(HttpStatusCode.Unauthorized)
             }
         }
     }

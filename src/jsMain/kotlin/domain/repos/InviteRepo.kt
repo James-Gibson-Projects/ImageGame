@@ -1,7 +1,7 @@
 package domain.repos
 
 import kotlinx.coroutines.flow.Flow
-import model.InvitationsState
+import model.messages.InvitationsState
 
 interface InviteRepo {
 

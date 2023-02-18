@@ -6,13 +6,14 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import io.ktor.websocket.*
 import domain.exceptions.InviteAlreadySentException
 import domain.exceptions.SelfInviteException
 import domain.exceptions.UserNotFoundException
 import domain.model.UserSession
+import io.ktor.serialization.*
+import model.messages.InvitationsState
+import model.messages.InviteResponse
 import org.koin.ktor.ext.inject
-import java.util.*
 
 fun Application.configureFriendRequestRoutes(){
     val repo by inject<FriendRequestRepo>()
@@ -24,15 +25,23 @@ fun Application.configureFriendRequestRoutes(){
                 val thisConnection = Connection(this, userSession)
                 connections += userSession.username to thisConnection
                 try {
-                    sendSerialized(repo.getUserIncomingInvites(userSession.username))
+                    sendSerialized<InviteResponse>(InviteResponse.Success(InvitationsState(repo.getUserOutgoingInvites(userSession.username), repo.getUserIncomingInvites(userSession.username))))
                     for (frame in incoming) {
-                        frame as? Frame.Text ?: continue
-                        val username = frame.readText()
-                        val otherConnection = connections[username] ?: throw Exception("user connection not found")
-                        try{ repo.sendRequest(userSession.username, username) }
-                        catch (_: InviteAlreadySentException) {}
-                        catch (_: SelfInviteException) {}
-                        catch (_: UserNotFoundException) {}
+                        val username = converter!!.deserialize<String>(frame)
+                        try {
+                            repo.sendRequest(userSession.username, username)
+                            sendSerialized<InviteResponse>(InviteResponse.Success(InvitationsState(repo.getUserOutgoingInvites(userSession.username), repo.getUserIncomingInvites(userSession.username))))
+                        }
+                        catch (_: InviteAlreadySentException) {
+                            sendSerialized<InviteResponse>(InviteResponse.Error("Friend request already sent"))
+                        }
+                        catch (_: UserNotFoundException) {
+                            sendSerialized<InviteResponse>(InviteResponse.Error("User not found: $username"))
+                        }
+                        catch (_: SelfInviteException) {
+                            sendSerialized<InviteResponse>(InviteResponse.Error("You can't send a friend request to yourself"))
+                        }
+                        val otherConnection = connections[username] ?: continue
                         otherConnection.webSocketSession.sendSerialized(repo.getUserIncomingInvites(otherConnection.userSession.username))
                     }
                 }

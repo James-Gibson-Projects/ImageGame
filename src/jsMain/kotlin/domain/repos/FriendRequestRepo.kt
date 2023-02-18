@@ -1,7 +1,6 @@
 package domain.repos
 
 import kotlinx.coroutines.flow.Flow
-import model.InvitationsState
 
 interface FriendRequestRepo {
     fun inviteUser(username: String)
