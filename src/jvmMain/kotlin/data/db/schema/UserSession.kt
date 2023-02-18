@@ -1,7 +1,6 @@
 package data.db.schema
 
 import domain.model.UserSession
-import io.ktor.server.auth.*
 import uk.gibby.neo4k.returns.graph.entities.Node
 import uk.gibby.neo4k.returns.primitives.StringReturn
 import uk.gibby.neo4k.returns.util.ReturnScope
