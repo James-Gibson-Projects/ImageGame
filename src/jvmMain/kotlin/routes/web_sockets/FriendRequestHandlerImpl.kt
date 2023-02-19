@@ -40,9 +40,8 @@ class FriendRequestHandlerImpl: FriendRequestHandler, KoinComponent {
                 sendSerialized<InviteResponse>(
                     InviteResponse.Success(
                         InvitationsState(
-                            repo.getUserOutgoingInvites(
-                                session.username
-                            ), repo.getUserIncomingInvites(session.username)
+                            repo.getUserOutgoingInvites(session.username),
+                            repo.getUserIncomingInvites(session.username)
                         )
                     )
                 )
@@ -54,7 +53,13 @@ class FriendRequestHandlerImpl: FriendRequestHandler, KoinComponent {
                 sendSerialized<InviteResponse>(InviteResponse.Error("You can't send a friend request to yourself"))
             }
             val otherConnection = connections[username] ?: return
-            otherConnection.webSocketSession.sendSerialized(repo.getUserIncomingInvites(otherConnection.userSession.username))
+            otherConnection.webSocketSession.sendSerialized<InviteResponse>(
+                    InviteResponse.Success(InvitationsState(
+                        repo.getUserOutgoingInvites(otherConnection.userSession.username),
+                        repo.getUserIncomingInvites(otherConnection.userSession.username)
+                    )
+                )
+            )
         }
     override suspend fun DefaultWebSocketServerSession.onClose(session: UserSession) {}
 }

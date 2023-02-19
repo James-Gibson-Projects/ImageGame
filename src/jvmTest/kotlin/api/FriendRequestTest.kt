@@ -82,10 +82,10 @@ class FriendRequestTest: KoinTest{
         val user2 = createUser("TestUser2", "TestPass123")
 
         user1.incoming.first() `should be equal to` emptyList()
-        // user1.outgoing.first() `should be equal to` emptyList()
+        user1.outgoing.first() `should be equal to` emptyList()
 
         user2.incoming.first() `should be equal to` emptyList()
-       // user2.outgoing.first() `should be equal to` emptyList()
+        user2.outgoing.first() `should be equal to` emptyList()
 
         user1.sendRequest("TestUser2")
 
