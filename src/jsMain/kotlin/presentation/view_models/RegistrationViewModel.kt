@@ -5,7 +5,6 @@ import app.softwork.routingcompose.Router
 import model.UserCredentials
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import domain.repos.UserRepo
 import kotlinx.coroutines.*
 
 class RegistrationViewModel(private val router: Router): KoinComponent {

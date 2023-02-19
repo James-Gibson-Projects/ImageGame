@@ -3,7 +3,12 @@ package model.messages
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class InviteRequest(val name: String): WebsocketRequest()
+sealed class InviteRequest: WebsocketRequest(){
+    @Serializable
+    data class SendRequest(val name: String): InviteRequest()
+    @Serializable
+    class Refresh: InviteRequest()
+}
 
 @Serializable
 sealed class InviteResponse: WebsocketResponse() {

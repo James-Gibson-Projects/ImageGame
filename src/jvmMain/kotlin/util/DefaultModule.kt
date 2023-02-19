@@ -1,7 +1,7 @@
 package util
 
-import data.FriendRequestClientRepo
-import data.FriendRequestClientRepoImpl
+import data.repo.FriendRequestClientRepo
+import data.repo.FriendRequestClientRepoImpl
 import data.db.Neo4jDatabase
 import data.db.Neo4jDatabaseImpl
 import data.repo.*

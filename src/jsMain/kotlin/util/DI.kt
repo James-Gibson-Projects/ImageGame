@@ -3,14 +3,11 @@ package util
 import data.*
 import data.remote.Remote
 import data.remote.RemoteImpl
-import data.repo.FriendRequestRepoImpl
-import data.repo.FriendsRepoImpl
-import data.repo.InviteRepoImpl
-import data.repo.UserRepoImpl
-import domain.repos.FriendRequestRepo
+import data.repo.*
+import data.websocket.WebSocket
+import data.websocket.WebSocketImpl
 import domain.repos.FriendsRepo
 import domain.repos.InviteRepo
-import domain.repos.UserRepo
 import org.koin.dsl.module
 
 @Suppress("unused")

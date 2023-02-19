@@ -22,21 +22,39 @@ class FriendRequestHandlerImpl: FriendRequestHandler, KoinComponent {
         return request is InviteRequest
     }
 
-    override suspend fun DefaultWebSocketServerSession.onConnect(session: UserSession) {
-        sendSerialized<InviteResponse>(
-            InviteResponse.Success(
-                InvitationsState(
-                    repo.getUserOutgoingInvites(session.username),
-                    repo.getUserIncomingInvites(session.username)
-                )
-            )
-        )
-    }
+    override suspend fun DefaultWebSocketServerSession.onConnect(session: UserSession) {}
 
     override suspend fun DefaultWebSocketServerSession.handle(session: UserSession, request: WebsocketRequest) {
-            val username = (request as InviteRequest).name
-            try {
-                repo.sendRequest(session.username, username)
+            if(request is InviteRequest.SendRequest) {
+                val otherUsername = request.name
+                try {
+                    repo.sendRequest(session.username, otherUsername)
+                    sendSerialized<InviteResponse>(
+                        InviteResponse.Success(
+                            InvitationsState(
+                                repo.getUserOutgoingInvites(session.username),
+                                repo.getUserIncomingInvites(session.username)
+                            )
+                        )
+                    )
+                    val otherConnection = connections[otherUsername]
+                        ?: return
+                    otherConnection.webSocketSession.sendSerialized<InviteResponse>(
+                        InviteResponse.Success(
+                            InvitationsState(
+                                repo.getUserOutgoingInvites(otherConnection.userSession.username),
+                                repo.getUserIncomingInvites(otherConnection.userSession.username)
+                            )
+                        )
+                    )
+                } catch (_: InviteAlreadySentException) {
+                    sendSerialized<InviteResponse>(InviteResponse.Error("Friend request already sent"))
+                } catch (_: UserNotFoundException) {
+                    sendSerialized<InviteResponse>(InviteResponse.Error("User not found: $otherUsername"))
+                } catch (_: SelfInviteException) {
+                    sendSerialized<InviteResponse>(InviteResponse.Error("You can't send a friend request to yourself"))
+                }
+            } else if(request is InviteRequest.Refresh){
                 sendSerialized<InviteResponse>(
                     InviteResponse.Success(
                         InvitationsState(
@@ -45,21 +63,7 @@ class FriendRequestHandlerImpl: FriendRequestHandler, KoinComponent {
                         )
                     )
                 )
-            } catch (_: InviteAlreadySentException) {
-                sendSerialized<InviteResponse>(InviteResponse.Error("Friend request already sent"))
-            } catch (_: UserNotFoundException) {
-                sendSerialized<InviteResponse>(InviteResponse.Error("User not found: $username"))
-            } catch (_: SelfInviteException) {
-                sendSerialized<InviteResponse>(InviteResponse.Error("You can't send a friend request to yourself"))
             }
-            val otherConnection = connections[username] ?: return
-            otherConnection.webSocketSession.sendSerialized<InviteResponse>(
-                    InviteResponse.Success(InvitationsState(
-                        repo.getUserOutgoingInvites(otherConnection.userSession.username),
-                        repo.getUserIncomingInvites(otherConnection.userSession.username)
-                    )
-                )
-            )
         }
     override suspend fun DefaultWebSocketServerSession.onClose(session: UserSession) {}
 }

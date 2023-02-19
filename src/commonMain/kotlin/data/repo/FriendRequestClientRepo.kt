@@ -1,10 +1,10 @@
-package data
+package data.repo
 
 import kotlinx.coroutines.flow.Flow
+import model.messages.InvitationsState
 
 interface FriendRequestClientRepo {
     suspend fun inviteUser(username: String)
-    suspend fun observeIncomingFriendRequests(): Flow<List<String>>
+    fun observeFriendState(): Flow<InvitationsState>
     suspend fun observeErrors(): Flow<String>
-    suspend fun observeOutgoingFriendRequests(): Flow<List<String>>
 }
