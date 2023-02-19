@@ -1,7 +1,8 @@
 package util
 
-import data.database.Remote
-import data.database.RemoteImpl
+import data.*
+import data.remote.Remote
+import data.remote.RemoteImpl
 import data.repo.FriendRequestRepoImpl
 import data.repo.FriendsRepoImpl
 import data.repo.InviteRepoImpl
@@ -17,8 +18,9 @@ private val lazy = LazyThreadSafetyMode.PUBLICATION
 
 val appModule = module {
     single<Remote> { RemoteImpl() }
+    single<WebSocket>{ WebSocketImpl(defaultClient) }
     single<UserRepo> { UserRepoImpl() }
     single<InviteRepo> { InviteRepoImpl() }
     single<FriendsRepo> { FriendsRepoImpl() }
-    single<FriendRequestRepo> { FriendRequestRepoImpl() }
+    single<FriendRequestClientRepo> { FriendRequestClientRepoImpl(get()) }
 }

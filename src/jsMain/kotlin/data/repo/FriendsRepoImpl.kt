@@ -1,6 +1,6 @@
 package data.repo
 
-import data.database.Remote
+import data.remote.Remote
 import domain.repos.FriendsRepo
 import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*

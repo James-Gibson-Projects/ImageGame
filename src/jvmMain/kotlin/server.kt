@@ -25,7 +25,6 @@ fun Application.applicationModule() {
     install(Routing)
     configureKoin()
     configureSecurity()
-    configureTemplating()
     configureSerialization()
     configureWebsockets()
     configureStatusPages()

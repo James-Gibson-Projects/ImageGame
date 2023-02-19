@@ -1,6 +1,6 @@
 package data.repo
 
-import data.database.Remote
+import data.remote.Remote
 import domain.repos.UserRepo
 import io.ktor.client.request.*
 import io.ktor.http.*

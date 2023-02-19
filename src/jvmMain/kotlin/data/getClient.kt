@@ -2,23 +2,19 @@ package data
 
 import exceptions.CustomResponseException
 import io.ktor.client.*
-import io.ktor.client.engine.js.*
+import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.http.ContentType.Application.Json
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.HttpStatusCode.Companion.OK
-import io.ktor.serialization.kotlinx.*
-import kotlinx.serialization.json.Json
+import io.ktor.serialization.kotlinx.json.*
 
+actual fun getClient(): HttpClient = defaultClient
 
-val defaultClient = HttpClient(Js){
+val defaultClient = HttpClient(CIO) {
+
     install(ContentNegotiation) {
-        val converter = KotlinxSerializationConverter(Json {
-            prettyPrint = true
-            ignoreUnknownKeys = true
-        })
-        register(Json, converter)
+        json()
     }
     install(WebSockets) {
         pingInterval = 20_000
@@ -32,4 +28,3 @@ val defaultClient = HttpClient(Js){
         }
     }
 }
-

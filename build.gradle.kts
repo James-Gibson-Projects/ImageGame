@@ -58,6 +58,10 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
                 implementation("io.insert-koin:koin-core:3.2.2")
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-client-websockets:$ktorVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
         }
         val commonTest by getting{
@@ -88,21 +92,11 @@ kotlin {
                 implementation("io.insert-koin:koin-ktor:3.2.2")
                 implementation("io.insert-koin:koin-logger-slf4j:3.2.2")
 
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
+
                 implementation("org.mindrot:jbcrypt:0.4")
 
                 implementation("com.natpryce:konfig:1.6.10.0")
-
-                implementation("com.github.mnbjhu.KotlinRedisGraph:core:0.9.2")
-
-                configurations.getByName("kapt").dependencies.add(
-                    org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency(
-                        "com.github.mnbjhu.KotlinRedisGraph",
-                        "annotations",
-                        "0.9.2"
-                    )
-                )
-
-
 
             }
         }
@@ -120,11 +114,7 @@ kotlin {
                 implementation("app.softwork:routing-compose:0.2.7")
                 implementation("org.jetbrains.compose.web:web-svg-js:1.2.0")
 
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
-                implementation("io.ktor:ktor-client-core:$ktorVersion")
-                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-                implementation("io.ktor:ktor-client-websockets:$ktorVersion")
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-extensions:1.0.1-pre.256-kotlin-1.5.31")
                 implementation("io.ktor:ktor-client-js:$ktorVersion")
 

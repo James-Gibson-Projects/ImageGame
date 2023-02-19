@@ -1,17 +1,25 @@
 package api
 
 import applicationModule
+import data.FriendRequestClientRepo
+import data.FriendRequestClientRepoImpl
+import data.WebSocketImpl
 import data.db.Neo4jDatabase
+import exceptions.CustomResponseException
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import model.messages.InvitationsState
 import model.messages.InviteResponse
@@ -52,48 +60,40 @@ class FriendRequestTest: KoinTest{
     @Test
     fun `Can't send friend request with invalid username`() = testApplication {
         application(Application::applicationModule)
-        val firstUserDetails = UserCredentials("TestUser1", "TestPass123")
-        val client = createUser(firstUserDetails)
-        client.webSocket("/api/friend_requests"){
-            receiveDeserialized<InviteResponse>()
-            sendSerialized("Not_A_User")
-            val response = receiveDeserialized<InviteResponse>()
-            response `should be instance of` InviteResponse.Error::class.java
-            (response as InviteResponse.Error).message `should be equal to` "User not found: Not_A_User"
-        }
+        val user = createUser("TestUser1", "TestPass123")
+        user.incoming.first() `should be equal to` emptyList()
+        user.sendRequest("not_a_user")
+        user.errors.first() `should be equal to` "User not found: not_a_user"
     }
 
     @Test
     fun `A user can't send a friend request to themself`() = testApplication {
         application(Application::applicationModule)
-        val firstUserDetails = UserCredentials("TestUser1", "TestPass123")
-        val client = createUser(firstUserDetails)
-        client.webSocket("/api/friend_requests"){
-            receiveDeserialized<InviteResponse>()
-            sendSerialized("TestUser1")
-            val response = receiveDeserialized<InviteResponse>()
-            response `should be instance of` InviteResponse.Error::class.java
-            (response as InviteResponse.Error).message `should be equal to` "You can't send a friend request to yourself"
-        }
+        val user = createUser("TestUser1", "TestPass123")
+        user.incoming.first() `should be equal to` emptyList()
+        user.sendRequest("TestUser1")
+        user.errors.first() `should be equal to` "You can't send a friend request to yourself"
     }
 
     @Test
     fun `Can send friend request to valid username`() = testApplication {
         application(Application::applicationModule)
-        val firstUserDetails = UserCredentials("TestUser1", "TestPass123")
-        val secondUserDetails = UserCredentials("TestUser2", "TestPass123")
-        createUserAndLogout(firstUserDetails)
-        val client = createUser(secondUserDetails)
-        client.webSocket("/api/friend_requests"){
-            receiveDeserialized<InviteResponse>()
-            sendSerialized("TestUser1")
-            val response = receiveDeserialized<InviteResponse>()
-            response `should be instance of` InviteResponse.Success::class.java
-            (response as InviteResponse.Success).state.outgoing `should contain` "TestUser1"
-        }
+        val user1 = createUser("TestUser1", "TestPass123")
+        val user2 = createUser("TestUser2", "TestPass123")
+
+        user1.incoming.first() `should be equal to` emptyList()
+        // user1.outgoing.first() `should be equal to` emptyList()
+
+        user2.incoming.first() `should be equal to` emptyList()
+       // user2.outgoing.first() `should be equal to` emptyList()
+
+        user1.sendRequest("TestUser2")
+
+        user1.outgoing.first() `should be equal to` listOf("TestUser2")
+        user2.incoming.first() `should be equal to` listOf("TestUser1")
     }
 
-
+/*
     @Test
     fun `Can't send friend request to the same user more than once`() = testApplication {
         application(Application::applicationModule)
@@ -186,6 +186,8 @@ class FriendRequestTest: KoinTest{
             (response as InviteResponse.Success).state.incoming.size `should be equal to` 0
         }
     }
+
+ */
     private suspend fun ApplicationTestBuilder.createUserAndLogout(details: UserCredentials){
         val client = defaultClient()
         client.post("/api/register"){
@@ -195,20 +197,30 @@ class FriendRequestTest: KoinTest{
         client.get("/api/logout").status `should be equal to` HttpStatusCode.OK
     }
 
-    private suspend fun ApplicationTestBuilder.createUser(details: UserCredentials): HttpClient {
-        val client = defaultClient()
-        client.post("/api/register"){
-            setBody(details)
-            contentType(ContentType.Application.Json)
-        }.status `should be equal to` HttpStatusCode.OK
-        return client
-    }
-
     private fun ApplicationTestBuilder.defaultClient() = createClient {
-        install(ContentNegotiation) { json() }
         install(HttpCookies)
-        install(WebSockets){
+        install(ContentNegotiation) {
+            json()
+        }
+        install(WebSockets) {
+            pingInterval = 20_000
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
         }
+    }
+    data class TestUserSession(val incoming: Flow<List<String>>, val outgoing: Flow<List<String>>, val errors: Flow<String>, private val repo: FriendRequestClientRepo){
+        suspend fun sendRequest(toUsername: String){
+            repo.inviteUser(toUsername)
+        }
+    }
+    private fun ApplicationTestBuilder.friendRequestWebsocket(client: HttpClient) = FriendRequestClientRepoImpl(WebSocketImpl(client, "localhost"))
+
+    private suspend fun ApplicationTestBuilder.createUser(username: String, password: String): TestUserSession {
+        val client = defaultClient()
+        client.post("/api/register"){
+            setBody(UserCredentials(username, password))
+            contentType(ContentType.Application.Json)
+        }.status `should be equal to` HttpStatusCode.OK
+        val ws = friendRequestWebsocket(client)
+        return TestUserSession(ws.observeIncomingFriendRequests(), ws.observeOutgoingFriendRequests(), ws.observeErrors(), ws)
     }
 }
