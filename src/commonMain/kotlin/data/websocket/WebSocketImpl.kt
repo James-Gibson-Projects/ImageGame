@@ -26,7 +26,6 @@ class WebSocketImpl(val client: HttpClient, private val host: String = "localhos
             connection = client.webSocketSession(
                 host = host,
                 path = "/live",
-                port = 8080
             )
             scope.launch {
                 connection!!.incoming

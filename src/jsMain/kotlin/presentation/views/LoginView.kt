@@ -2,6 +2,8 @@ package presentation.views
 
 import androidx.compose.runtime.*
 import app.softwork.routingcompose.NavLink
+import app.softwork.routingcompose.Router
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.dom.*
 import presentation.components.DefaultButton
 import presentation.components.DefaultPasswordField
@@ -15,12 +17,16 @@ fun LoginView(viewModel: LoginViewModel){
     var username by remember{ viewModel.usernameState }
     var password by remember{ viewModel.passwordState }
     var loginFailed by remember { viewModel.loginFailedState }
+    val scope = rememberCoroutineScope()
     LoginLayout{
+        val router = Router.current
         Div(attrs = { classes("-space-y-px rounded-md shadow-sm".split(" ")) }) {
             DefaultTextField(username, "Username", "username") { username = it }
             DefaultPasswordField(password, "password") { password = it }
         }
-        DefaultButton("Sign-In") { viewModel.login() }
+        DefaultButton("Sign-In") {
+            viewModel.login()
+        }
         if(loginFailed) Div(attrs = { classes("text-red-800") }){
             Text("Failed To Login...")
         }

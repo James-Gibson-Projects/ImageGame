@@ -13,7 +13,6 @@ import util.config
 fun main() {
     embeddedServer(
         Jetty,
-        port = 8080,
         host = config[Config.serverHost],
         module = Application::applicationModule
     ).start(wait = true)
