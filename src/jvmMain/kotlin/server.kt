@@ -1,10 +1,11 @@
 import io.ktor.server.application.*
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.jetty.Jetty
+import io.ktor.server.engine.*
+import io.ktor.server.jetty.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.request.*
 import io.ktor.server.routing.*
-
 import net.malkowscy.application.routes.plugins.configureKoin
-import routes.plugins.configureRouting
+import org.slf4j.event.Level
 import routes.plugins.*
 import util.Config
 import util.config
@@ -29,5 +30,9 @@ fun Application.applicationModule() {
     configureWebsockets()
     configureStatusPages()
     configureRouting()
+    install(CallLogging) {
+        level = Level.INFO
+        filter { call -> call.request.path().startsWith("/") }
+    }
 }
 

@@ -1,6 +1,8 @@
 package data
 
+import defaultClient
 import io.ktor.client.*
-import io.ktor.client.engine.js.*
 
-actual fun getClient(): HttpClient = defaultClient
+actual fun getClient(): HttpClient {
+    return defaultClient
+}

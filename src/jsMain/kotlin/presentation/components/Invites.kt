@@ -1,32 +1,39 @@
 package presentation.components
 
 import androidx.compose.runtime.*
+import data.repo.FriendRequestClientRepo
 import model.messages.InvitationsState
-import org.jetbrains.compose.web.dom.Br
-import org.jetbrains.compose.web.dom.Button
-import org.jetbrains.compose.web.dom.Text
-import org.jetbrains.compose.web.dom.TextInput
-import presentation.view_models.InvitesViewModel
+import org.jetbrains.compose.web.dom.*
+import presentation.view_models.FriendRequestsViewModel
 
 
 @Composable
-fun InvitesComponent(viewModel: InvitesViewModel){
-    val invites: InvitationsState by viewModel.invites.collectAsState(InvitationsState(emptyList(), emptyList()))
-    var toInvite by remember{ viewModel.toInviteState }
-    var error by remember { viewModel.errorState }
+fun InvitesComponent(viewModel: FriendRequestsViewModel){
+    val invites: InvitationsState? by viewModel
+        .friendRequestsStateFlow
+        .collectAsState(null)
+    val error: String? by viewModel
+        .errorFlow
+        .collectAsState(null)
+    var toInvite by remember{ mutableStateOf("") }
     TextInput(toInvite) { onInput { toInvite = it.value } }
     Button(
         attrs = {
-            onClick {
-                viewModel.sendInvite(toInvite)
-            }
+            onClick { viewModel.sendFriendRequest(toInvite) }
         }
     ) {
         Text("Send")
     }
-    invites.incoming.forEach {
+    invites?.incoming?.forEach {
         Text(it)
         Br()
+    }
+
+    invites?.incoming?.forEach {
+        Div(attrs = { classes("") }) {
+            Text(it)
+            Br()
+        }
     }
 }
 

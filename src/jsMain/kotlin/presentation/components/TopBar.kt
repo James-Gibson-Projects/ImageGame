@@ -3,6 +3,7 @@ package presentation.components
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import model.messages.InvitationsState
 import org.jetbrains.compose.web.ExperimentalComposeWebSvgApi
 import org.jetbrains.compose.web.attributes.alt
 import org.jetbrains.compose.web.dom.*
@@ -158,7 +159,9 @@ private fun ProfileDropdown() {
 @OptIn(ExperimentalComposeWebSvgApi::class)
 @Composable
 private fun FriendRequestDropDown(viewModel: FriendRequestsViewModel) {
-    val requests by viewModel.receivedFriendRequests.collectAsState(emptyList())
+    val requests: InvitationsState? by viewModel
+        .friendRequestsStateFlow
+        .collectAsState(null)
     Div(attrs = { classes("relative ml-3".split(" ")) }) {
         Div(attrs = {}) {
             Button(attrs = {
@@ -173,7 +176,7 @@ private fun FriendRequestDropDown(viewModel: FriendRequestsViewModel) {
         }
         Div(attrs = { classes("absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none".split(" ")) }) {
             // Active: "bg-gray-100", Not Active: ""
-            requests.forEachIndexed { index, username ->
+            requests?.incoming?.forEachIndexed { index, username ->
                 A(attrs = { classes("block px-4 py-2 text-sm text-gray-700".split(" ")); id("user-menu-item-$index"); }) {
                     Text(username)
                 }

@@ -3,11 +3,7 @@ package presentation.views
 import androidx.compose.runtime.Composable
 import app.softwork.routingcompose.NavLink
 import org.jetbrains.compose.web.dom.Br
-import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
-import presentation.components.SideBar
-import presentation.components.TopBar
-import presentation.view_models.FriendsViewModel
 
 @Composable
 fun HomeView(){

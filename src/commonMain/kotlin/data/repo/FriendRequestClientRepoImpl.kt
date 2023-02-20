@@ -21,7 +21,7 @@ class FriendRequestClientRepoImpl(private val webSocket: WebSocket): FriendReque
         .observeResponses(InviteResponse.Success::class, InviteRequest.Refresh())
         .map { it.state }
 
-    override suspend fun observeErrors() = webSocket
+    override fun observeErrors() = webSocket
         .observeResponses(InviteResponse.Error::class)
         .map { it.message }
 

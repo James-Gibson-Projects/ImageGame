@@ -1,12 +1,10 @@
 package presentation.components
 
 import androidx.compose.runtime.*
-import model.ActiveStatus
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
-import presentation.view_models.FriendsViewModel
 
-
+/*
 @Composable
 fun SideBar(viewModel: FriendsViewModel){
     val friends by viewModel.invites.collectAsState(listOf())
@@ -23,3 +21,5 @@ fun FriendCard(activeStatus: Pair<String, Long>){
         Text("last online: ${activeStatus.second / 60000}m ago")
     }
 }
+
+ */

@@ -1,5 +1,6 @@
 package presentation.views
 
+/*
 import androidx.compose.runtime.Composable
 import domain.models.ChessBoard
 import org.jetbrains.compose.web.css.*
@@ -31,6 +32,8 @@ fun Board(state: ChessBoard){
     }
 }
 
+
+ */
 
 
 

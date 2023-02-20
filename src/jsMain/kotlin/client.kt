@@ -1,20 +1,20 @@
-import kotlinx.html.div
-import kotlinx.html.dom.append
-import org.w3c.dom.Node
-import kotlinx.browser.document
-import kotlinx.browser.window
-/*
-fun main() {
-    kotlinext.js.require("./app.css")
-    window.onload = { document.body?.sayHello() }
-}
+import exceptions.CustomResponseException
+import io.ktor.client.*
+import io.ktor.client.engine.js.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.cookies.*
+import io.ktor.client.plugins.websocket.*
+import io.ktor.serialization.kotlinx.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 
-
- */
-fun Node.sayHello() {
-    append {
-        div {
-            +"Hello from JS"
-        }
+val defaultClient = HttpClient(Js){
+    install(HttpCookies)
+    install(ContentNegotiation) {
+        json()
+    }
+    install(WebSockets) {
+        pingInterval = 20_000
+        contentConverter = KotlinxWebsocketSerializationConverter(Json)
     }
 }

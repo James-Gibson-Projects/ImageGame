@@ -18,6 +18,7 @@ fun Application.configureWebsocket(){
     routing {
         authenticate("auth-session"){
             webSocket("/live") {
+                this@configureWebsocket.log.info("connecting")
                 val userSession = call.principal<UserSession>()!!
                 val thisConnection = Connection(this, userSession)
                 connections += userSession.username to thisConnection

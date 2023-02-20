@@ -157,6 +157,9 @@ tasks.getByName<JavaExec>("run") {
 
 // Suppresses a "without declaring an explicit or implicit dependency" warning
 tasks.getByName("startScripts").dependsOn("metadataJar")
+dependencies {
+    implementation("io.ktor:ktor-server-call-logging-jvm:2.2.1")
+}
 tasks.test {
     useJUnitPlatform()
 }

@@ -18,4 +18,5 @@ val defaultModule = module {
     single<FriendRepo>{ FriendRepoImpl() }
     single<FriendRequestClientRepo> { FriendRequestClientRepoImpl(get()) }
     single<FriendRequestHandler> { FriendRequestHandlerImpl() }
+    single<LoginRepo> { LoginRepoImpl() }
 }

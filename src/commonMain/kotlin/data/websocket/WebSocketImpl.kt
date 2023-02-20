@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
-class WebSocketImpl(val client: HttpClient, private val host: String = "192.168.1.118") : WebSocket {
+class WebSocketImpl(val client: HttpClient, private val host: String = "localhost") : WebSocket {
 
     private val scope = CoroutineScope(Dispatchers.Default)
     private var connection: DefaultClientWebSocketSession? = null
@@ -25,7 +25,8 @@ class WebSocketImpl(val client: HttpClient, private val host: String = "192.168.
         connectingJob = scope.async {
             connection = client.webSocketSession(
                 host = host,
-                path = "/live"
+                path = "/live",
+                port = 8080
             )
             scope.launch {
                 connection!!.incoming
