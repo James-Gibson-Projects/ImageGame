@@ -39,7 +39,6 @@ fun TopBar() {
                         }
                     }
                     // Profile dropdown
-                    FriendRequestDropDown(FriendRequestsViewModel())
                 }
             }
         }
@@ -152,34 +151,6 @@ private fun ProfileDropdown() {
             }
             A(attrs = { classes("block px-4 py-2 text-sm text-gray-700".split(" ")); id("user-menu-item-2"); }) {
                 Text("Sign out")
-            }
-        }
-    }
-}
-@OptIn(ExperimentalComposeWebSvgApi::class)
-@Composable
-private fun FriendRequestDropDown(viewModel: FriendRequestsViewModel) {
-    val requests: InvitationsState? by viewModel
-        .friendRequestsStateFlow
-        .collectAsState(null)
-    Div(attrs = { classes("relative ml-3".split(" ")) }) {
-        Div(attrs = {}) {
-            Button(attrs = {
-                classes("flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800".split(" ")); id("user-menu-button") }) {
-                Span(attrs = { classes("sr-only".split(" ")) }) {
-                    Text("Open friend requests")
-                }
-                Svg {
-                    Image("/static/svg/friend_request.svg")
-                }
-            }
-        }
-        Div(attrs = { classes("absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none".split(" ")) }) {
-            // Active: "bg-gray-100", Not Active: ""
-            requests?.incoming?.forEachIndexed { index, username ->
-                A(attrs = { classes("block px-4 py-2 text-sm text-gray-700".split(" ")); id("user-menu-item-$index"); }) {
-                    Text(username)
-                }
             }
         }
     }

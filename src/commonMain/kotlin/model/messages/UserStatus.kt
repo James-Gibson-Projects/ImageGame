@@ -1,27 +1,18 @@
 package model.messages
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class UserStatus{
-
-    @Serializable
-    sealed class Friend: UserStatus(){
-
-        @Serializable
-        class Online: UserStatus()
-
-        @Serializable
-        class Offline: UserStatus()
-
-    }
-
-    @Serializable
-    class FriendRequestSent: UserStatus()
-
-    @Serializable
-    class FriendRequestReceived: UserStatus()
+enum class UserStatus {
+    Online,
+    Offline,
+    FriendRequestSent,
+    FriendRequestReceived
 }
 
 @Serializable
-class FriendState(val users: Map<String, UserStatus>): WebsocketResponse()
+data class FriendState(val users: List<UserData>): WebsocketResponse()
+
+@Serializable
+data class UserData(val name: String, val status: UserStatus)

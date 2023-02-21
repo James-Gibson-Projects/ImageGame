@@ -14,7 +14,7 @@ sealed class FriendRequest: WebsocketRequest(){
 sealed class InviteResponse: WebsocketResponse() {
 
     @Serializable
-    data class Success(val state: InvitationsState): InviteResponse()
+    class Success: InviteResponse()
 
     @Serializable
     data class Error(val message: String): InviteResponse()

@@ -14,6 +14,7 @@ fun main() {
     embeddedServer(
         Jetty,
         host = config[Config.serverHost],
+        port = 8080,
         module = Application::applicationModule
     ).start(wait = true)
 }

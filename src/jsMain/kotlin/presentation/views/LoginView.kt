@@ -17,9 +17,7 @@ fun LoginView(viewModel: LoginViewModel){
     var username by remember{ viewModel.usernameState }
     var password by remember{ viewModel.passwordState }
     var loginFailed by remember { viewModel.loginFailedState }
-    val scope = rememberCoroutineScope()
     LoginLayout{
-        val router = Router.current
         Div(attrs = { classes("-space-y-px rounded-md shadow-sm".split(" ")) }) {
             DefaultTextField(username, "Username", "username") { username = it }
             DefaultPasswordField(password, "password") { password = it }
@@ -35,7 +33,7 @@ fun LoginView(viewModel: LoginViewModel){
             NavLink(
                 to = "/register",
                 attrs = { classes("text-blue-500", "hover:underline") }
-            ){
+            ) {
                 Text("Sign-Up Here")
             }
         }

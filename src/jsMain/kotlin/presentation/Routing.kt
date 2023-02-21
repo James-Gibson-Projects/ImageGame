@@ -19,7 +19,7 @@ class AppRoot{
             val router = Router.current
             route("/home") {
                 // HomeView(FriendsViewModel())
-                HomeView()
+                HomeView(FriendRequestsViewModel())
             }
             route("/register") {
                 val viewModel = RegistrationViewModel(router)

@@ -46,10 +46,10 @@ class FriendRequestHandlerImpl: FriendRequestHandler, KoinComponent {
         }
 
     private suspend fun DefaultWebSocketServerSession.sendUpdatedState(name: String) {
-        val outgoing: List<Pair<String, UserStatus>> = friendRequestRepo.getUserOutgoingInvites(name).map { it to UserStatus.FriendRequestSent() }
-        val incoming: List<Pair<String, UserStatus>> = friendRequestRepo.getUserIncomingInvites(name).map { it to UserStatus.FriendRequestReceived() }
-        val friends: List<Pair<String, UserStatus>> = friendRepo.getFriends(name).map { it.username to if(it.isOnline) UserStatus.Friend.Online() else UserStatus.Friend.Offline() }
-        sendSerialized(FriendState((outgoing + incoming + friends).toMap()))
+        val outgoing = friendRequestRepo.getUserOutgoingInvites(name).map { UserData(it, UserStatus.FriendRequestSent) }
+        val incoming = friendRequestRepo.getUserIncomingInvites(name).map { UserData(it, UserStatus.FriendRequestReceived) }
+        val friends= friendRepo.getFriends(name).map { UserData(it.username, if(it.isOnline) UserStatus.Online else UserStatus.Offline) }
+        sendSerialized<WebsocketResponse>(FriendState(outgoing + incoming + friends))
     }
 
     override suspend fun DefaultWebSocketServerSession.onClose(session: UserSession) {}
