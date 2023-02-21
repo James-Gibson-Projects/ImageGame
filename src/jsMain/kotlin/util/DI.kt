@@ -13,5 +13,5 @@ private val lazy = LazyThreadSafetyMode.PUBLICATION
 val appModule = module {
     single<WebSocket>{ WebSocketImpl(defaultClient) }
     single<LoginRepo> { LoginRepoImpl() }
-    single<FriendRequestClientRepo> { FriendRequestClientRepoImpl(get()) }
+    single<FriendClientRepo> { FriendClientRepoImpl(get()) }
 }

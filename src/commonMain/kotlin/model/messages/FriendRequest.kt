@@ -3,11 +3,11 @@ package model.messages
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class InviteRequest: WebsocketRequest(){
+sealed class FriendRequest: WebsocketRequest(){
     @Serializable
-    data class SendRequest(val name: String): InviteRequest()
+    data class SendRequest(val name: String): FriendRequest()
     @Serializable
-    class Refresh: InviteRequest()
+    class Refresh: FriendRequest()
 }
 
 @Serializable

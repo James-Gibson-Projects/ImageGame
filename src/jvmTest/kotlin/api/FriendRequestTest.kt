@@ -1,8 +1,8 @@
 package api
 
 import applicationModule
-import data.repo.FriendRequestClientRepo
-import data.repo.FriendRequestClientRepoImpl
+import data.repo.FriendClientRepo
+import data.repo.FriendClientRepoImpl
 import data.websocket.WebSocketImpl
 import data.db.Neo4jDatabase
 import io.ktor.client.*
@@ -17,9 +17,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.single
 import kotlinx.serialization.json.Json
 import model.UserCredentials
 import model.messages.InvitationsState
@@ -225,22 +223,22 @@ class FriendRequestTest: KoinTest{
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
         }
     }
-    data class TestUserSession(val friendState: Flow<InvitationsState>, val errors: Flow<String>, private val repo: FriendRequestClientRepo){
+    data class TestUserSession(val friendState: Flow<InvitationsState>, val errors: Flow<String>, private val repo: FriendClientRepo){
         suspend fun sendsRequestTo(toUsername: String){
             repo.inviteUser(toUsername)
         }
     }
-    private fun ApplicationTestBuilder.friendRequestWebsocket(client: HttpClient) = FriendRequestClientRepoImpl(
+    private fun ApplicationTestBuilder.friendRequestWebsocket(client: HttpClient) = FriendClientRepoImpl(
         WebSocketImpl(client, "localhost")
     )
 
-    private suspend fun ApplicationTestBuilder.createUser(username: String, password: String): TestUserSession {
+    private suspend fun ApplicationTestBuilder.createUser(username: String, password: String): FriendClientRepo {
         val client = defaultClient()
         client.post("/api/register"){
             setBody(UserCredentials(username, password))
             contentType(ContentType.Application.Json)
         }.status `should be equal to` OK
-        val ws = friendRequestWebsocket(client)
-        return TestUserSession(ws.observeFriendState(), ws.observeErrors(), ws)
+        return friendRequestWebsocket(client)
+
     }
 }

@@ -1,7 +1,6 @@
 package presentation.components
 
 import androidx.compose.runtime.*
-import data.repo.FriendRequestClientRepo
 import model.messages.InvitationsState
 import org.jetbrains.compose.web.dom.*
 import presentation.view_models.FriendRequestsViewModel

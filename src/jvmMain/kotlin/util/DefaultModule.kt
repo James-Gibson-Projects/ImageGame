@@ -1,7 +1,7 @@
 package util
 
-import data.repo.FriendRequestClientRepo
-import data.repo.FriendRequestClientRepoImpl
+import data.repo.FriendClientRepo
+import data.repo.FriendClientRepoImpl
 import data.db.Neo4jDatabase
 import data.db.Neo4jDatabaseImpl
 import data.repo.*
@@ -16,7 +16,7 @@ val defaultModule = module {
     single<InviteRepo>{ InviteRepoImpl() }
     single<FriendRequestRepo>{ FriendRequestRepoImpl() }
     single<FriendRepo>{ FriendRepoImpl() }
-    single<FriendRequestClientRepo> { FriendRequestClientRepoImpl(get()) }
+    single<FriendClientRepo> { FriendClientRepoImpl(get()) }
     single<FriendRequestHandler> { FriendRequestHandlerImpl() }
     single<LoginRepo> { LoginRepoImpl() }
 }

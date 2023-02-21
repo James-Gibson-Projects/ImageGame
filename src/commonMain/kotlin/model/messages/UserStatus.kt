@@ -17,10 +17,10 @@ sealed class UserStatus{
     }
 
     @Serializable
-    class InviteSent: UserStatus()
+    class FriendRequestSent: UserStatus()
 
     @Serializable
-    class InviteReceived: UserStatus()
+    class FriendRequestReceived: UserStatus()
 }
 
 @Serializable
