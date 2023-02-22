@@ -4,7 +4,7 @@ import io.ktor.server.jetty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
-import net.malkowscy.application.routes.plugins.configureKoin
+import routes.plugins.configureKoin
 import org.slf4j.event.Level
 import routes.plugins.*
 import util.Config

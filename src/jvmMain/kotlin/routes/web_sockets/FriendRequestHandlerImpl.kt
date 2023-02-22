@@ -55,3 +55,4 @@ class FriendRequestHandlerImpl: FriendRequestHandler, KoinComponent {
     override suspend fun DefaultWebSocketServerSession.onClose(session: UserSession) {}
 }
 
+data class Connection(val webSocketSession: DefaultWebSocketServerSession, val userSession: UserSession)

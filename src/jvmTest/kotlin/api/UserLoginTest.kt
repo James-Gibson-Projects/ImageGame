@@ -13,7 +13,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import model.UserCredentials
-import net.malkowscy.application.routes.plugins.configureKoin
+import routes.plugins.configureKoin
 import org.amshove.kluent.`should be equal to`
 import org.junit.After
 import org.junit.Before

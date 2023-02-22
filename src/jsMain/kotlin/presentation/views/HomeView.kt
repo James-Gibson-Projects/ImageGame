@@ -2,6 +2,7 @@ package presentation.views
 
 import androidx.compose.runtime.*
 import model.messages.FriendState
+import model.messages.InviteResponse
 import model.messages.UserStatus
 import org.jetbrains.compose.web.dom.*
 import presentation.components.DefaultButton
@@ -28,6 +29,7 @@ fun HomeView(){
 fun HomeView(friendRequestsViewModel: FriendRequestsViewModel) = Div( { classes("fixed", "right-0", "h-screen", "bg-gray-100", "flex", "flex-col", "p-4") } ) {
     val friendState by friendRequestsViewModel.friendRequestsStateFlow.collectAsState(FriendState(emptyList()))
     var textFieldValue by remember { friendRequestsViewModel.textBoxState }
+    val error by friendRequestsViewModel.errorFlow.collectAsState(InviteResponse.Success)
     Div( { classes("text-lg", "font-bold", "mb-4") } ) { Text("ONLINE FRIENDS") }
     Div( { classes("flex-1", "flex", "flex-col", "space-y-2") } ) {
         friendState.users
@@ -38,10 +40,15 @@ fun HomeView(friendRequestsViewModel: FriendRequestsViewModel) = Div( { classes(
     Div( { classes("flex-1", "flex", "flex-col", "space-y-2") } ) {
         friendState.users
             .filter { it.status == UserStatus.FriendRequestReceived }
-            .forEach { FriendRequest(it.name){ friendRequestsViewModel.acceptFriendRequest(it.name) } }
+            .forEach { FriendRequest(it.name){ friendRequestsViewModel.sendFriendRequest(it.name) } }
     }
-    DefaultTextField(textFieldValue, "Username", "SendFriendRequestTextField"){ textFieldValue = it }
-    DefaultButton("Send Friend Request"){ friendRequestsViewModel.sendFriendRequest() }
+
+    Div( { classes("flex-4", "flex", "flex-col", "space-y-2") } ) {
+        if(error is InviteResponse.Error) Text((error as InviteResponse.Error).message)
+        DefaultTextField(textFieldValue, "Username", "SendFriendRequestTextField"){ textFieldValue = it }
+        DefaultButton("Send Friend Request"){ friendRequestsViewModel.sendFriendRequest(textFieldValue); textFieldValue = "" }
+        DefaultButton("Refresh"){ friendRequestsViewModel.refresh() }
+    }
 }
 
 @Composable

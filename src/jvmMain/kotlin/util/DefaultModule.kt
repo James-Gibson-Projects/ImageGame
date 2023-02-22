@@ -11,11 +11,13 @@ import routes.web_sockets.FriendRequestHandler
 import routes.web_sockets.FriendRequestHandlerImpl
 
 val defaultModule = module {
+
     single<Neo4jDatabase> { Neo4jDatabaseImpl() }
+
     single<UserRepo> { UserRepoImpl() }
-    single<InviteRepo>{ InviteRepoImpl() }
     single<FriendRequestRepo>{ FriendRequestRepoImpl() }
     single<FriendRepo>{ FriendRepoImpl() }
+
     single<FriendClientRepo> { FriendClientRepoImpl(get()) }
     single<FriendRequestHandler> { FriendRequestHandlerImpl() }
     single<LoginRepo> { LoginRepoImpl() }

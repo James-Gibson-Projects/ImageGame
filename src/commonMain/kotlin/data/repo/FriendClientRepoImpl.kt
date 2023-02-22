@@ -15,6 +15,10 @@ class FriendClientRepoImpl(private val webSocket: WebSocket): FriendClientRepo, 
         webSocket.sendRequest(FriendRequest.SendRequest(username))
     }
 
+    override suspend fun refresh() {
+        webSocket.sendRequest(FriendRequest.Refresh())
+    }
+
     override fun observeFriendState(): Flow<FriendState> {
         return webSocket.observeResponses(FriendState::class, FriendRequest.Refresh())
     }

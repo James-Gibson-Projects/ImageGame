@@ -7,11 +7,9 @@ import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
 import kotlinx.html.*
 import routes.http.configureUserRoutes
-import routes.web_sockets.configureInviteRoutes
 
 fun Application.configureRouting() {
 	configureUserRoutes()
-	configureInviteRoutes()
 	routing {
 		get("/webapp/{...}") {
 			call.respondHtml {

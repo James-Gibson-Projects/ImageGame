@@ -1,4 +1,4 @@
-package net.malkowscy.application.routes.plugins
+package routes.plugins
 
 import io.ktor.server.application.*
 import util.defaultModule

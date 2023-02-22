@@ -58,7 +58,6 @@ class FriendRequestTest: KoinTest{
     fun `Can't send friend request with invalid username`() = testApplication {
         application(Application::applicationModule)
         val user = createUser("TestUser1", "TestPass123")
-        val userFriendState = user.observeFriendState()
         val userErrorState = user.observeErrorState()
         user.inviteUser("not_a_user")
         val response = userErrorState.first()

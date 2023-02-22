@@ -14,10 +14,11 @@ class FriendRequestsViewModel: KoinComponent {
     val friendRequestsStateFlow = repo.observeFriendState()
     val textBoxState = mutableStateOf("")
     val errorFlow = repo.observeErrorState()
-    fun sendFriendRequest(){
-        scope.launch { repo.inviteUser(textBoxState.value) }
-    }
-    fun acceptFriendRequest(name: String){
+    fun sendFriendRequest(name: String){
         scope.launch { repo.inviteUser(name) }
+    }
+
+    fun refresh(){
+        scope.launch { repo.refresh() }
     }
 }
