@@ -12,6 +12,7 @@ import uk.gibby.neo4k.core.invoke
 import uk.gibby.neo4k.core.of
 import uk.gibby.neo4k.paths.`o-→`
 import uk.gibby.neo4k.paths.`←-o`
+import uk.gibby.neo4k.queries.build
 import uk.gibby.neo4k.queries.query
 import uk.gibby.neo4k.returns.primitives.LongReturn
 import uk.gibby.neo4k.returns.primitives.StringReturn
@@ -28,6 +29,8 @@ val createGame = query(::StringReturn, ::StringReturn, ::StringReturn) { whiteNa
         it[blackHasCastled] = false
         it[this.id] = id
     } `←-o` ::PlayingIn { it[playingAsWhite] = false } `←-o` blackPlayer)
-}.bui
+}.build()
 
-val movePiece = query()
+val movePiece = query(::StringReturn, ::StringReturn){
+
+}

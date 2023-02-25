@@ -78,7 +78,7 @@ kotlin {
                 implementation("io.ktor:ktor-server-jetty:$ktorVersion")
                 implementation("org.slf4j:slf4j-api:$slf4jVersion")
                 runtimeOnly("org.slf4j:slf4j-simple:$slf4jVersion")
-                implementation("com.github.mnbjhu:neo4k:0.0.7-alpha")
+                implementation("com.github.mnbjhu:neo4k:0.1.0-alpha")
                 implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
                 implementation("io.ktor:ktor-server-host-common-jvm:$ktorVersion")
                 implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
