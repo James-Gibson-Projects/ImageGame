@@ -11,13 +11,11 @@ sealed class FriendRequest: WebsocketRequest(){
 }
 
 @Serializable
-sealed class InviteResponse: WebsocketResponse() {
+sealed class FriendResponse: WebsocketResponse() {
 
     @Serializable
-    class Success: InviteResponse()
+    class Success: FriendResponse()
 
     @Serializable
-    data class Error(val message: String): InviteResponse()
+    data class Error(val message: String): FriendResponse()
 }
-@Serializable
-data class InvitationsState(val outgoing: List<String>, val incoming: List<String>)

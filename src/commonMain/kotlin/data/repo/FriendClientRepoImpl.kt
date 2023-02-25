@@ -2,11 +2,9 @@ package data.repo
 
 import data.websocket.WebSocket
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import model.messages.InvitationsState
 import model.messages.FriendRequest
 import model.messages.FriendState
-import model.messages.InviteResponse
+import model.messages.FriendResponse
 import org.koin.core.component.KoinComponent
 
 class FriendClientRepoImpl(private val webSocket: WebSocket): FriendClientRepo, KoinComponent {
@@ -23,7 +21,7 @@ class FriendClientRepoImpl(private val webSocket: WebSocket): FriendClientRepo, 
         return webSocket.observeResponses(FriendState::class, FriendRequest.Refresh())
     }
 
-    override fun observeErrorState(): Flow<InviteResponse> {
-        return webSocket.observeResponses(InviteResponse::class)
+    override fun observeErrorState(): Flow<FriendResponse> {
+        return webSocket.observeResponses(FriendResponse::class)
     }
 }

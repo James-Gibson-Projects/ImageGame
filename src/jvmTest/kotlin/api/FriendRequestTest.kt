@@ -16,12 +16,10 @@ import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import model.UserCredentials
-import model.messages.InvitationsState
-import model.messages.InviteResponse
+import model.messages.FriendResponse
 import org.amshove.kluent.`should be equal to`
 import org.amshove.kluent.`should be instance of`
 import org.junit.After
@@ -61,8 +59,8 @@ class FriendRequestTest: KoinTest{
         val userErrorState = user.observeErrorState()
         user.inviteUser("not_a_user")
         val response = userErrorState.first()
-        response `should be instance of` InviteResponse.Error::class
-        (response as InviteResponse.Error)
+        response `should be instance of` FriendResponse.Error::class
+        (response as FriendResponse.Error)
             .message `should be equal to` "User not found: not_a_user"
 
     }
@@ -227,11 +225,6 @@ class FriendRequestTest: KoinTest{
         install(WebSockets) {
             pingInterval = 20_000
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
-        }
-    }
-    data class TestUserSession(val friendState: Flow<InvitationsState>, val errors: Flow<String>, private val repo: FriendClientRepo){
-        suspend fun sendsRequestTo(toUsername: String){
-            repo.inviteUser(toUsername)
         }
     }
     private fun ApplicationTestBuilder.friendRequestWebsocket(client: HttpClient) = FriendClientRepoImpl(

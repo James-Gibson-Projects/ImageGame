@@ -59,7 +59,7 @@ class WebSocketImpl(private val client: HttpClient, private val host: String = "
     @OptIn(InternalSerializationApi::class)
     override suspend fun sendRequest(request: WebsocketRequest) {
         connectingJob!!.await()
-        val json = Json.encodeToString(WebsocketRequest::class.serializer(), request)
+        val json = Json.encodeToString(WebsocketRequest.serializer(), request)
         connection!!.send(json)
     }
 }

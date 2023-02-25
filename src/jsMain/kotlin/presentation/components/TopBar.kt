@@ -1,14 +1,10 @@
 package presentation.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import model.messages.InvitationsState
 import org.jetbrains.compose.web.ExperimentalComposeWebSvgApi
 import org.jetbrains.compose.web.attributes.alt
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.svg.*
-import presentation.view_models.FriendRequestsViewModel
 
 @OptIn(ExperimentalComposeWebSvgApi::class)
 @Composable

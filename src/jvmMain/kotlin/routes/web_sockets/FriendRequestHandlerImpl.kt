@@ -6,7 +6,6 @@ import io.ktor.server.websocket.*
 import domain.exceptions.InviteAlreadySentException
 import domain.exceptions.SelfInviteException
 import domain.exceptions.UserNotFoundException
-import domain.model.User
 import domain.model.UserSession
 import domain.repo.FriendRepo
 import model.messages.*
@@ -34,11 +33,11 @@ class FriendRequestHandlerImpl: FriendRequestHandler, KoinComponent {
                         ?: return
                     otherConnection.webSocketSession.sendUpdatedState(otherUsername)
                 } catch (_: InviteAlreadySentException) {
-                    sendSerialized<InviteResponse>(InviteResponse.Error("Friend request already sent"))
+                    sendSerialized<FriendResponse>(FriendResponse.Error("Friend request already sent"))
                 } catch (_: UserNotFoundException) {
-                    sendSerialized<InviteResponse>(InviteResponse.Error("User not found: $otherUsername"))
+                    sendSerialized<FriendResponse>(FriendResponse.Error("User not found: $otherUsername"))
                 } catch (_: SelfInviteException) {
-                    sendSerialized<InviteResponse>(InviteResponse.Error("You can't send a friend request to yourself"))
+                    sendSerialized<FriendResponse>(FriendResponse.Error("You can't send a friend request to yourself"))
                 }
             } else if(request is FriendRequest.Refresh){
                 sendUpdatedState(session.username)
