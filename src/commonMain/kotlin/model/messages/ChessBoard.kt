@@ -7,6 +7,7 @@ import kotlin.math.abs
 
 @Serializable
 data class ChessBoard(
+    val id: String,
     val turn: Color,
     val spaces: List<List<Piece?>>,
     val whiteCastle: Boolean,
@@ -41,6 +42,7 @@ data class ChessBoard(
         return getAllMoves(color.opponentColor()).any { it.second.contains(kingPos) }
     }
     fun movePiece(from: Vec2, to: Vec2) = ChessBoard(
+        id,
         turn.opponentColor(),
         map { pos, piece ->
             when(pos){
@@ -55,6 +57,7 @@ data class ChessBoard(
     companion object {
         @JvmStatic
         val startBoard = ChessBoard(
+            id = List(20){ ('A' .. 'Z').random() }.joinToString(""),
             turn = Color.White,
             spaces = listOf(
                 listOf(Piece.Rook(Color.Black), Piece.Knight(Color.Black), Piece.Bishop(Color.Black), Piece.Queen(Color.Black), Piece.King(Color.Black), Piece.Bishop(Color.Black), Piece.Knight(Color.Black), Piece.Rook(Color.Black)),
@@ -84,11 +87,14 @@ data class Vec2(val x: Int, val y: Int) {
 
 
 @Serializable
-sealed class Piece(val color: Color) {
+sealed class Piece {
+    abstract val color: Color
     fun Piece.isFriendly() = this@Piece.color == this.color
     fun Piece.isEnemy() = this@Piece.color != this.color
     abstract fun getMoves(position: Vec2, board: ChessBoard): List<Vec2>
-    class Pawn(color: Color): Piece(color){
+
+
+    class Pawn(override val color: Color): Piece(){
         override fun getMoves(position: Vec2, board: ChessBoard): List<Vec2> {
             val r = mutableListOf<Vec2>()
             val forwardOnce = position + color.forward
@@ -113,7 +119,9 @@ sealed class Piece(val color: Color) {
         }
     }
 
-    sealed class StaticMoving(color: Color, private val moves: List<Vec2>): Piece(color){
+    @Serializable
+    sealed class StaticMoving: Piece(){
+        protected abstract val moves: List<Vec2>
         override fun getMoves(position: Vec2, board: ChessBoard): List<Vec2> {
             return moves
                 .map { it + position }
@@ -121,7 +129,8 @@ sealed class Piece(val color: Color) {
         }
     }
 
-    sealed class StraightMoving(color: Color, private val direction: List<Vec2>): Piece(color){
+    sealed class StraightMoving(): Piece(){
+        protected abstract val direction: List<Vec2>
         override fun getMoves(position: Vec2, board: ChessBoard): List<Vec2> {
             return direction.flatMap {
                 var toCheck = position + it
@@ -139,11 +148,30 @@ sealed class Piece(val color: Color) {
         }
     }
 
-    class Knight(color: Color): StaticMoving(color, knightMoves)
-    class Bishop(color: Color): StraightMoving(color, bishopDirections)
-    class Rook(color: Color): StraightMoving(color, rookDirections)
-    class Queen(color: Color): StraightMoving(color, bishopDirections + rookDirections)
-    class King(color: Color): StaticMoving(color, bishopDirections + rookDirections)
+    data class Knight(override val color: Color): StaticMoving() {
+        override val moves: List<Vec2>
+            get() = knightMoves
+    }
+
+    data class Bishop(override val color: Color): StraightMoving() {
+        override val direction: List<Vec2>
+            get() = bishopDirections
+    }
+
+    data class Rook(override val color: Color): StraightMoving() {
+        override val direction: List<Vec2>
+            get() = rookDirections
+    }
+
+    data class Queen(override val color: Color): StraightMoving() {
+        override val direction: List<Vec2>
+            get() = bishopDirections + rookDirections
+    }
+
+    data class King(override val color: Color): StaticMoving() {
+        override val moves: List<Vec2>
+            get() = bishopDirections + rookDirections
+    }
 
     companion object{
         @JvmStatic
@@ -177,6 +205,7 @@ sealed class Piece(val color: Color) {
     }
 }
 
+@Serializable
 enum class Color(val forward: Vec2){
     White(Vec2(0, 1)),
     Black(Vec2(0, -1));
