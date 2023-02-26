@@ -31,6 +31,11 @@ val createGame = query(::StringReturn, ::StringReturn, ::StringReturn) { whiteNa
     } `←-o` ::PlayingIn { it[playingAsWhite] = false } `←-o` blackPlayer)
 }.build()
 
-val movePiece = query(::StringReturn, ::StringReturn){
+val getGame = query(::StringReturn, ::StringReturn) { username, gameId ->
+    val (_, _, game) = match(::UserNode { it[this.username] = username } `o-→` ::PlayingIn `o-→` ::Game { it[id] = gameId})
+    game
+}
+
+val movePiece = query(::StringReturn, ::StringReturn) {
 
 }
