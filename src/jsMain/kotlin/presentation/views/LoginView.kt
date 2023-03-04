@@ -14,8 +14,8 @@ import presentation.view_models.LoginViewModel
 
 @Composable
 fun LoginView(viewModel: LoginViewModel){
-    var username by remember{ viewModel.usernameState }
-    var password by remember{ viewModel.passwordState }
+    var username by remember { viewModel.usernameState }
+    var password by remember { viewModel.passwordState }
     var loginFailed by remember { viewModel.loginFailedState }
     LoginLayout{
         Div(attrs = { classes("-space-y-px rounded-md shadow-sm".split(" ")) }) {
@@ -23,7 +23,7 @@ fun LoginView(viewModel: LoginViewModel){
             DefaultPasswordField(password, "password") { password = it }
         }
         DefaultButton("Sign-In") {
-            viewModel.login()
+            viewModel.login(username, password)
         }
         if(loginFailed) Div(attrs = { classes("text-red-800") }){
             Text("Failed To Login...")

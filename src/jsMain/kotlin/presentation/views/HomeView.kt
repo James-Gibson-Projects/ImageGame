@@ -1,13 +1,15 @@
 package presentation.views
 
 import androidx.compose.runtime.*
-import model.messages.FriendState
-import model.messages.FriendResponse
-import model.messages.UserStatus
+import app.softwork.routingcompose.Router
+import kotlinx.coroutines.delay
+import model.messages.*
 import org.jetbrains.compose.web.dom.*
 import presentation.components.DefaultButton
 import presentation.components.DefaultTextField
+import presentation.components.GameInviteNotification
 import presentation.view_models.FriendRequestsViewModel
+import presentation.view_models.GameRequestViewModel
 
 /*
 @Composable
@@ -24,9 +26,36 @@ fun HomeView(){
 }
 
  */
+@Composable
+fun HomeView(
+    friendRequestsViewModel: FriendRequestsViewModel,
+    gameRequestViewModel: GameRequestViewModel
+){
+    SideBar(friendRequestsViewModel)
+    NotificationOverlay(gameRequestViewModel)
+}
 
 @Composable
-fun HomeView(friendRequestsViewModel: FriendRequestsViewModel) = Div( { classes("fixed", "right-0", "h-screen", "bg-gray-100", "flex", "flex-col", "p-4") } ) {
+fun NotificationOverlay(viewModel: GameRequestViewModel){
+    val notificationResponse by viewModel.gameInviteFlow.collectAsState(null)
+    var notification: String? by remember { mutableStateOf(null) }
+    val router = Router.current
+    LaunchedEffect(notificationResponse){
+        if(notificationResponse is GameInviteResponse.Received){
+            notification = (notificationResponse as GameInviteResponse.Received).from
+            delay(10_000)
+            notification = null
+        } else if (notificationResponse is GameInviteResponse.Started){
+            router.navigate("/game/${(notificationResponse as GameInviteResponse.Started).gameId}")
+        }
+    }
+    notification?.let {
+        GameInviteNotification(it, { viewModel.acceptRequest(it) }, {})
+    }
+}
+
+@Composable
+fun SideBar(friendRequestsViewModel: FriendRequestsViewModel) = Div( { classes("fixed", "right-0", "h-screen", "bg-gray-100", "flex", "flex-col", "p-4") } ) {
     val friendState by friendRequestsViewModel.friendRequestsStateFlow.collectAsState(FriendState(emptyList()))
     var textFieldValue by remember { friendRequestsViewModel.textBoxState }
     val error by friendRequestsViewModel.errorFlow.collectAsState(FriendResponse.Success)
@@ -34,7 +63,7 @@ fun HomeView(friendRequestsViewModel: FriendRequestsViewModel) = Div( { classes(
     Div( { classes("flex-1", "flex", "flex-col", "space-y-2") } ) {
         friendState.users
             .filter { it.status == UserStatus.Online || it.status == UserStatus.Offline }
-            .forEach { Friend(it.name) }
+            .forEach { Friend(it.name){ friendRequestsViewModel.sendGameRequest(it.name) } }
     }
     Div( { classes("text-lg", "font-bold", "mt-4", "mb-4") } ) { Text("INCOMING FRIEND REQUESTS") }
     Div( { classes("flex-1", "flex", "flex-col", "space-y-2") } ) {
@@ -52,10 +81,12 @@ fun HomeView(friendRequestsViewModel: FriendRequestsViewModel) = Div( { classes(
 }
 
 @Composable
-fun Friend(name: String){
+fun Friend(name: String, action: () -> Unit){
     Label( attrs = { classes("flex", "items-center", "py-2", "px-3", "rounded-md", "hover:bg-gray-200") } ) {
         Text(name)
-        Button( { classes("ml-auto", "rounded-md", "bg-green-500", "text-white", "py-1", "px-2", "hover:bg-green-600") } ) { Text("Invite") }
+        Button( { classes("ml-auto", "rounded-md", "bg-green-500", "text-white", "py-1", "px-2", "hover:bg-green-600"); onClick { action() } } ) {
+            Text("Invite")
+        }
     }
 }
 

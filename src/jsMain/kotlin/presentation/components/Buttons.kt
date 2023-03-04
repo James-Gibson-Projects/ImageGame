@@ -11,9 +11,6 @@ import org.jetbrains.compose.web.attributes.forId
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.svg.*
 
-/**
- * https://tailwindui.com/components/application-ui/forms/sign-in-forms
- */
 
 @OptIn(ExperimentalComposeWebSvgApi::class)
 @Composable

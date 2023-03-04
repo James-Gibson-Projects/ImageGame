@@ -17,11 +17,6 @@ class GameWebsocketHandler: WebSocketHandler, KoinComponent{
 
     override suspend fun DefaultWebSocketServerSession.handle(session: UserSession, request: WebsocketRequest) {
         request as GameRequest
-        when(request){
-            is GameRequest.Refresh -> {
-
-            }
-        }
     }
 
     override suspend fun DefaultWebSocketServerSession.onClose(session: UserSession) {

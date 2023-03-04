@@ -1,6 +1,7 @@
 package routes.web_sockets
 
 import domain.model.UserSession
+import domain.repo.GameRequestRepo
 import domain.repo.UserRepo
 import io.ktor.serialization.*
 import io.ktor.server.application.*
@@ -13,8 +14,9 @@ import org.koin.ktor.ext.inject
 val connections = mutableMapOf<String, Connection>()
 fun Application.configureWebsocket(){
     val friendRequests: FriendRequestHandler by inject()
+    val gameRequests: GameRequestHandler by inject()
     val userRepo: UserRepo by inject()
-    val handlers = listOf<WebSocketHandler>(friendRequests)
+    val handlers = listOf(friendRequests, gameRequests)
     routing {
         authenticate("auth-session"){
             webSocket("/live") {

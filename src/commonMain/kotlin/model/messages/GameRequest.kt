@@ -1,5 +1,6 @@
 package model.messages
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 

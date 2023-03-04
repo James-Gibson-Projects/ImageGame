@@ -22,7 +22,7 @@ fun RegistrationView(viewModel: RegistrationViewModel){
             DefaultTextField(username, "Username", "username") { username = it }
             DefaultPasswordField(password, "password") { password = it }
         }
-        DefaultButton("Sign-Up", color = "green") { viewModel.register() }
+        DefaultButton("Sign-Up", color = "green") { viewModel.register(username, password) }
         if(signupFailed) Div(attrs = { classes("text-red-500") }){
             Text("Failed To sign-up...")
         }
