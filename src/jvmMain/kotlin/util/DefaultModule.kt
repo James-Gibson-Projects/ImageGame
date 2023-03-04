@@ -10,8 +10,8 @@ import domain.repo.GameRequestRepo
 import org.koin.dsl.module
 import routes.web_sockets.FriendRequestHandler
 import routes.web_sockets.FriendRequestHandlerImpl
-import routes.web_sockets.GameRequestHandler
-import routes.web_sockets.GameRequestHandlerImpl
+import routes.web_sockets.GameInviteRequestHandler
+import routes.web_sockets.GameInviteRequestHandlerImpl
 
 val defaultModule = module {
 
@@ -25,6 +25,6 @@ val defaultModule = module {
 
     single<FriendClientRepo> { FriendClientRepoImpl(get()) }
     single<FriendRequestHandler> { FriendRequestHandlerImpl() }
-    single<GameRequestHandler> { GameRequestHandlerImpl() }
+    single<GameInviteRequestHandler> { GameInviteRequestHandlerImpl() }
     single<LoginRepo> { LoginRepoImpl() }
 }

@@ -12,15 +12,13 @@ import uk.gibby.neo4k.returns.util.ReturnScope
 
 class Game(
     val id: StringReturn,
-    val board: ArrayReturn<List<Long>, ArrayReturn<Long, LongReturn>>,
+    val board: ArrayReturn<Long, LongReturn>,
     val isWhitesTurn: BooleanReturn,
     val whiteHasCastled: BooleanReturn,
     val blackHasCastled: BooleanReturn,
 ): Node<ChessBoard>() {
     override fun ReturnScope.decode(): ChessBoard {
-        val spaces = ::board.result().map { col ->
-            col.map { Piece.parse(it.toInt()) }
-        }
+        val spaces = ChessBoard.decode(::board.result().map { it.toInt() })
         return ChessBoard(
             ::id.result(),
             if(::isWhitesTurn.result()) Color.White else Color.Black,

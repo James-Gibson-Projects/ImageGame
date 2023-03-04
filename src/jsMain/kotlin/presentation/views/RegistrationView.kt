@@ -3,7 +3,6 @@ package presentation.views
 
 import androidx.compose.runtime.*
 import app.softwork.routingcompose.NavLink
-import app.softwork.routingcompose.Router
 import org.jetbrains.compose.web.dom.*
 import presentation.components.DefaultButton
 import presentation.components.DefaultPasswordField
@@ -22,7 +21,14 @@ fun RegistrationView(viewModel: RegistrationViewModel){
             DefaultTextField(username, "Username", "username") { username = it }
             DefaultPasswordField(password, "password") { password = it }
         }
-        DefaultButton("Sign-Up", color = "green") { viewModel.register(username, password) }
+        DefaultButton(
+            text = "Sign-Up",
+            bgColor= "bg-green-600",
+            hoverColor= "hover:bg-green-700",
+            ringColor= "focus:ring-green-500",
+            iconColor= "text-green-500",
+            iconHoverColor= "group-hover:text-green-500",
+) { viewModel.register(username, password) }
         if(signupFailed) Div(attrs = { classes("text-red-500") }){
             Text("Failed To sign-up...")
         }

@@ -34,7 +34,8 @@ class GameRequestRepoImpl : GameRequestRepo, KoinComponent{
 
     @Throws(NoIncomingInviteException::class)
     override fun acceptRequest(fromUsername: String, toUsername: String): String {
-        if(fromUsername !in graph.getIncomingRequests(toUsername))
+        val toUsersIncoming = graph.getIncomingRequests(toUsername)
+        if(fromUsername !in toUsersIncoming)
             throw NoIncomingInviteException()
         graph.deleteGameRequest(fromUsername, toUsername)
         return if(Random.nextBoolean()){

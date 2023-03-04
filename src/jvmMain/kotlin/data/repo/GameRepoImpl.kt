@@ -7,6 +7,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.gibby.neo4k.core.Graph
 import data.db.queries.*
+import model.messages.Color
 import model.messages.Piece
 
 class GameRepoImpl : GameRepo, KoinComponent{
@@ -25,6 +26,10 @@ class GameRepoImpl : GameRepo, KoinComponent{
 
     override fun setGameState(gameId: String, game: ChessBoard) {
         graph.setGame(gameId, game.map { _, it -> Piece.encode(it).toLong() })
+    }
+
+    override fun getColor(gameId: String, username: String): Color {
+        return if(graph.getIsPlayingAsWhite(gameId, username).first()) Color.White else Color.Black
     }
 
     override fun getGames(username: String): List<String> {

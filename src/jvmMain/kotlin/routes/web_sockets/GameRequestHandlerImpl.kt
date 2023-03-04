@@ -1,37 +1,39 @@
 package routes.web_sockets
 
 import domain.model.UserSession
-import domain.repo.GameRequestRepo
+import domain.repo.GameRepo
 import io.ktor.server.websocket.*
-import model.messages.GameInviteRequest
-import model.messages.GameInviteResponse
+import model.messages.GameRequest
+import model.messages.GameResponse
 import model.messages.WebsocketRequest
-import model.messages.WebsocketResponse
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class GameRequestHandlerImpl : GameRequestHandler, KoinComponent {
-    val repo: GameRequestRepo by inject()
+    val repo: GameRepo by inject()
     override suspend fun shouldHandle(request: WebsocketRequest): Boolean {
-        return request is GameInviteRequest
+        return request is GameRequest
     }
 
-    override suspend fun DefaultWebSocketServerSession.onConnect(session: UserSession) {
-    }
+    override suspend fun DefaultWebSocketServerSession.onConnect(session: UserSession) { }
 
     override suspend fun DefaultWebSocketServerSession.handle(session: UserSession, request: WebsocketRequest) {
-        request as GameInviteRequest
+        request as GameRequest
         when(request){
-            is GameInviteRequest.Send -> {
-                repo.sendRequest(session.username, request.to)
-                connections[request.to]!!.webSocketSession.sendSerialized<WebsocketResponse>(GameInviteResponse.Received(request.to))
+            is GameRequest.Refresh -> {
+                val game = repo.getGameState(request.gameId)
+                val color = repo.getColor(game.id, session.username)
+                sendSerialized(GameResponse(game, game.getAllMoves(color), color))
             }
-            is GameInviteRequest.Accept -> {
-                val gameId = repo.acceptRequest(request.from, session.username)
-                sendSerialized<WebsocketResponse>(GameInviteResponse.Started(gameId))
+            is GameRequest.MovePiece -> {
+                val game = repo.getGameState(request.gameId)
+                val color = repo.getColor(game.id, session.username)
+                val moves = game.getAllMoves(color)
+                if(request.to !in moves.first { it.piece == request.from }.moves) throw Exception("Invalid Move")
+
             }
         }
     }
 
-    override suspend fun DefaultWebSocketServerSession.onClose(session: UserSession) {}
+    override suspend fun DefaultWebSocketServerSession.onClose(session: UserSession) { }
 }

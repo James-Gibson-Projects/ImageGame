@@ -14,23 +14,27 @@ import org.jetbrains.compose.web.svg.*
 
 @OptIn(ExperimentalComposeWebSvgApi::class)
 @Composable
-fun DefaultButton(
+inline fun DefaultButton(
     text: String,
-    color: String = "indigo",
-    action: () -> Unit,
+    bgColor: String = "bg-indigo-600",
+    hoverColor: String = "hover:bg-indigo-700",
+    ringColor: String = "focus:ring-indigo-500",
+    iconColor: String = "text-indigo-500",
+    iconHoverColor: String = "group-hover:text-indigo-500",
+    crossinline action: () -> Unit,
 ){
     Button({
         classes(("group relative flex w-full justify-center rounded-md" +
-                " border border-transparent bg-$color-600 py-2 px-4 text-sm" +
-                " font-medium text-white hover:bg-$color-700 focus:outline-none" +
-                " focus:ring-2 focus:ring-$color-500 focus:ring-offset-2").split(" "))
+                " border border-transparent $bgColor py-2 px-4 text-sm" +
+                " font-medium text-white $hoverColor focus:outline-none" +
+                " focus:ring-2 $ringColor focus:ring-offset-2").split(" "))
         onClick{ action() }
     }) {
         Span(attrs = { classes("absolute inset-y-0 left-0 flex items-center pl-3".split(" ")) }) {
             Svg(viewBox = "0 0 20 20",
                 attrs = {
                     xmlns("http://www.w3.org/2000/svg")
-                    classes("h-5 w-5 text-$color-500 group-hover:text-$color-400".split(" "))
+                    classes("h-5 w-5 $iconColor $iconHoverColor".split(" "))
                     fill("currentColor")
                 }
             ) {

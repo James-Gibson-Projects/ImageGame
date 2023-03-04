@@ -16,7 +16,7 @@ import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
 @OptIn(InternalSerializationApi::class)
-class WebSocketImpl(private val client: HttpClient, private val host: String = "localhost") : WebSocket {
+class WebSocketImpl(private val client: HttpClient, private val host: String = "192.168.1.118") : WebSocket {
     private val scope = CoroutineScope(Dispatchers.Default)
     private var connection: DefaultClientWebSocketSession? = null
     private var connectingJob: Deferred<*>? = null

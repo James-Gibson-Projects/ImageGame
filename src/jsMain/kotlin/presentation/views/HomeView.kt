@@ -1,6 +1,7 @@
 package presentation.views
 
 import androidx.compose.runtime.*
+import app.softwork.routingcompose.RouteBuilder
 import app.softwork.routingcompose.Router
 import kotlinx.coroutines.delay
 import model.messages.*
@@ -27,12 +28,29 @@ fun HomeView(){
 
  */
 @Composable
-fun HomeView(
+fun RouteBuilder.HomeView(
     friendRequestsViewModel: FriendRequestsViewModel,
     gameRequestViewModel: GameRequestViewModel
 ){
-    SideBar(friendRequestsViewModel)
-    NotificationOverlay(gameRequestViewModel)
+    Div(attrs = { classes("flex") }){
+        NotificationOverlay(gameRequestViewModel)
+        Div(attrs = { classes("flex-grow") }){
+            route("/game"){
+                string {
+                    Div(attrs = { classes("grid", "grid-cols-8", "gap-0.5", "aspect-square") }) {
+                        (1..64).forEach {
+                            Div(attrs = { classes(if(it % 2 == 0) "bg-white" else "bg-black", "flex", "items-center", "justify-center") }){
+                                Text(it.toString())
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Div(attrs = { classes("flex-initial", "w-64") }){
+            SideBar(friendRequestsViewModel)
+        }
+    }
 }
 
 @Composable
@@ -46,7 +64,7 @@ fun NotificationOverlay(viewModel: GameRequestViewModel){
             delay(10_000)
             notification = null
         } else if (notificationResponse is GameInviteResponse.Started){
-            router.navigate("/game/${(notificationResponse as GameInviteResponse.Started).gameId}")
+            router.navigate("/home/game/${(notificationResponse as GameInviteResponse.Started).gameId}")
         }
     }
     notification?.let {
@@ -55,7 +73,7 @@ fun NotificationOverlay(viewModel: GameRequestViewModel){
 }
 
 @Composable
-fun SideBar(friendRequestsViewModel: FriendRequestsViewModel) = Div( { classes("fixed", "right-0", "h-screen", "bg-gray-100", "flex", "flex-col", "p-4") } ) {
+fun SideBar(friendRequestsViewModel: FriendRequestsViewModel) = Div( { classes("h-screen", "bg-gray-100", "flex", "flex-col", "p-4") } ) {
     val friendState by friendRequestsViewModel.friendRequestsStateFlow.collectAsState(FriendState(emptyList()))
     var textFieldValue by remember { friendRequestsViewModel.textBoxState }
     val error by friendRequestsViewModel.errorFlow.collectAsState(FriendResponse.Success)

@@ -19,8 +19,8 @@ import uk.gibby.neo4k.returns.primitives.LongReturn
 import uk.gibby.neo4k.returns.primitives.StringReturn
 
 val createGame = query(::StringReturn, ::StringReturn) { whiteName, blackName ->
-    val spaces = array(array(::LongReturn)) of ChessBoard.startBoard
-        .map { _, piece -> Piece.encode(piece).toLong() }
+    val newBoard = ChessBoard.startBoard()
+    val spaces = array(::LongReturn) of ChessBoard.encode(newBoard)
     val (whitePlayer, blackPlayer) =
         match(::UserNode{ it[username] = whiteName }, ::UserNode{ it[username] = blackName})
     val (_, _, game) = create(whitePlayer `o-→` ::PlayingIn { it[playingAsWhite] = true } `o-→` ::Game {
@@ -28,7 +28,7 @@ val createGame = query(::StringReturn, ::StringReturn) { whiteName, blackName ->
         it[isWhitesTurn] = true
         it[whiteHasCastled] = false
         it[blackHasCastled] = false
-        it[this.id] = id
+        it[this.id] = newBoard.id
     } `←-o` ::PlayingIn { it[playingAsWhite] = false } `←-o` blackPlayer)
     game.id
 }.build()
@@ -45,4 +45,9 @@ val setGame = query(::StringReturn, array(array(::LongReturn))) { gameId, board 
 val getGames = query(::StringReturn) { username ->
     val (game) = match(::Game `←-o` ::PlayingIn `←-o` ::UserNode{ it[this.username] = username })
     game.id
+}.build()
+
+val getIsPlayingAsWhite = query(::StringReturn, ::StringReturn) { gameId, username ->
+    val (_, inGame) = match(::Game{ it[id] = gameId } `←-o` ::PlayingIn `←-o` ::UserNode{ it[this.username] = username })
+    inGame.playingAsWhite
 }.build()

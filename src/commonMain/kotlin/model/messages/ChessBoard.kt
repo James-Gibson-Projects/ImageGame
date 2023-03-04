@@ -26,11 +26,11 @@ data class ChessBoard(
             }
         }
     }
-    fun getAllMoves(color: Color): List<Pair<Vec2, List<Vec2>>>{
+    fun getAllMoves(color: Color): List<PieceMoves>{
         return map { pos, piece ->
-            if(piece == null || piece.color != color) return@map pos to listOf()
-            pos to piece.getMoves(pos, this)
-        }.flatten()
+            if(piece == null || piece.color != color) return@map null
+            PieceMoves(pos, piece.getMoves(pos, this))
+        }.flatten().filterNotNull()
     }
     fun inCheck(color: Color): Boolean{
         var kingPos: Vec2? = null
@@ -39,7 +39,7 @@ data class ChessBoard(
                 kingPos = pos
             }
         }
-        return getAllMoves(color.opponentColor()).any { it.second.contains(kingPos) }
+        return getAllMoves(color.opponentColor()).any { it.moves.contains(kingPos) }
     }
     fun movePiece(from: Vec2, to: Vec2) = ChessBoard(
         id,
@@ -56,7 +56,7 @@ data class ChessBoard(
     )
     companion object {
         @JvmStatic
-        val startBoard = ChessBoard(
+        fun startBoard() = ChessBoard(
             id = List(20){ ('A' .. 'Z').random() }.joinToString(""),
             turn = Color.White,
             spaces = listOf(
@@ -74,6 +74,14 @@ data class ChessBoard(
             whiteCastle = false,
             blackCastle = false
         )
+
+        @JvmStatic
+        fun encode(board: ChessBoard) = board
+            .map { _, piece -> Piece.encode(piece).toLong() }
+            .flatten()
+
+        @JvmStatic
+        fun decode(spaces: List<Int>) = spaces.map { Piece.parse(it) }.chunked(8)
     }
 }
 
