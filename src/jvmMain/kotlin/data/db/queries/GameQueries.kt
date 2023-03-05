@@ -51,3 +51,16 @@ val getIsPlayingAsWhite = query(::StringReturn, ::StringReturn) { gameId, userna
     val (_, inGame) = match(::Game{ it[id] = gameId } `←-o` ::PlayingIn `←-o` ::UserNode{ it[this.username] = username })
     inGame.playingAsWhite
 }.build()
+
+val getOtherPlayer = query(::StringReturn, ::StringReturn) { gameId, username ->
+    val newBoard = ChessBoard.startBoard()
+    val spaces = array(::LongReturn) of ChessBoard.encode(newBoard)
+    val (other) = match(::UserNode `o-→` ::PlayingIn { it[playingAsWhite] = true } `o-→` ::Game {
+        it[board] = spaces
+        it[isWhitesTurn] = true
+        it[whiteHasCastled] = false
+        it[blackHasCastled] = false
+        it[this.id] = newBoard.id
+    } `←-o` ::PlayingIn `←-o` ::UserNode{ it[this.username] = username })
+    other.username
+}.build()

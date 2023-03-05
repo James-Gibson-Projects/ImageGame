@@ -13,9 +13,10 @@ import org.koin.ktor.ext.inject
 val connections = mutableMapOf<String, Connection>()
 fun Application.configureWebsocket(){
     val friendRequests: FriendRequestHandler by inject()
-    val gameRequests: GameInviteRequestHandler by inject()
+    val gameInviteRequests: GameInviteRequestHandler by inject()
+    val gameRequests: GameRequestHandler by inject()
     val userRepo: UserRepo by inject()
-    val handlers = listOf(friendRequests, gameRequests)
+    val handlers = listOf(friendRequests, gameRequests, gameInviteRequests)
     routing {
         authenticate("auth-session"){
             webSocket("/live") {

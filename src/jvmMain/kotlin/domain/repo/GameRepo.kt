@@ -9,4 +9,5 @@ interface GameRepo {
     fun setGameState(gameId: String, game: ChessBoard)
     fun getColor(gameId: String, username: String): Color
     fun getGames(username: String): List<String>
+    fun getOtherUser(gameId: String, username: String): String
 }

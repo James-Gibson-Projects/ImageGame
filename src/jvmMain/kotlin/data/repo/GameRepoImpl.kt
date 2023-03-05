@@ -35,4 +35,8 @@ class GameRepoImpl : GameRepo, KoinComponent{
     override fun getGames(username: String): List<String> {
         return graph.getGames(username)
     }
+
+    override fun getOtherUser(gameId: String, username: String): String {
+        return graph.getOtherPlayer(gameId, username).first()
+    }
 }

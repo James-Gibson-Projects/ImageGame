@@ -148,7 +148,13 @@ val jvmJarTask = tasks.getByName<Jar>("jvmJar") {
     val jsBrowserProductionWebpack = tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack")
     from(jsBrowserProductionWebpack.destinationDirectory.resolve(jsBrowserProductionWebpack.outputFileName))
 }
-
+// optionally, you can add a task to copy the production version of your JS bundle to a resources folder of your choice
+val copyTailwindConfig by tasks.registering(Copy::class) {
+    include("tailwind.config.js")
+    from("$rootDir")
+    into("$rootDir/build/js/packages/kotlinjs-tailwindcss")
+}
+tasks.getByName("jsBrowserProductionWebpack").dependsOn(copyTailwindConfig)
 tasks.getByName<JavaExec>("run") {
     dependsOn(jvmJarTask)
     classpath(jvmJarTask)
