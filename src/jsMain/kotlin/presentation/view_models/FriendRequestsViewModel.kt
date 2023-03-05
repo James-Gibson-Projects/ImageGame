@@ -2,7 +2,7 @@ package presentation.view_models
 
 import androidx.compose.runtime.mutableStateOf
 import data.repo.FriendClientRepo
-import data.repo.GameRequestClientRepo
+import data.repo.GameInviteRequestClientRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,7 +11,7 @@ import org.koin.core.component.inject
 
 class FriendRequestsViewModel: KoinComponent {
     private val friendRepo by inject<FriendClientRepo>()
-    private val gameRequestRepo by inject<GameRequestClientRepo>()
+    private val gameRequestRepo by inject<GameInviteRequestClientRepo>()
     private val scope = CoroutineScope(Dispatchers.Default)
     val friendRequestsStateFlow = friendRepo.observeFriendState()
     val textBoxState = mutableStateOf("")

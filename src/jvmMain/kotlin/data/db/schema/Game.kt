@@ -2,7 +2,6 @@ package data.db.schema
 
 import model.messages.ChessBoard
 import model.messages.Color
-import model.messages.Piece
 import uk.gibby.neo4k.returns.generic.ArrayReturn
 import uk.gibby.neo4k.returns.graph.entities.Node
 import uk.gibby.neo4k.returns.primitives.BooleanReturn

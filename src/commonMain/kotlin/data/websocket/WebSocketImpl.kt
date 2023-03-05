@@ -15,8 +15,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
+const val hostname = "192.168.1.118"
 @OptIn(InternalSerializationApi::class)
-class WebSocketImpl(private val client: HttpClient, private val host: String = "192.168.1.118") : WebSocket {
+class WebSocketImpl(private val client: HttpClient, private val host: String = hostname) : WebSocket {
     private val scope = CoroutineScope(Dispatchers.Default)
     private var connection: DefaultClientWebSocketSession? = null
     private var connectingJob: Deferred<*>? = null
@@ -41,6 +42,7 @@ class WebSocketImpl(private val client: HttpClient, private val host: String = "
     }
 
     override fun connect() {
+        if (connection?.isActive == true || connectingJob?.isActive == true) return
         connectingJob = scope.async {
             connection = client.webSocketSession(
                 host = host,

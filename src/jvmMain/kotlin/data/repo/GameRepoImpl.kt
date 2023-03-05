@@ -17,7 +17,7 @@ class GameRepoImpl : GameRepo, KoinComponent{
         graph = db.graph
     }
     override fun createGame(whiteUsername: String, blackUsername: String): String {
-        return graph.createGame(whiteUsername, blackUsername).first()
+        return graph.createGame(whiteUsername, blackUsername, List(20){ ('A' .. 'Z').random() }.joinToString("")).first()
     }
 
     override fun getGameState(gameId: String): ChessBoard {
@@ -25,7 +25,7 @@ class GameRepoImpl : GameRepo, KoinComponent{
     }
 
     override fun setGameState(gameId: String, game: ChessBoard) {
-        graph.setGame(gameId, game.map { _, it -> Piece.encode(it).toLong() })
+        graph.setGame(gameId, game.map { _, it -> Piece.encode(it).toLong() }.flatten())
     }
 
     override fun getColor(gameId: String, username: String): Color {

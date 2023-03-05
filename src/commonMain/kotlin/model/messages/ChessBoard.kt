@@ -27,10 +27,18 @@ data class ChessBoard(
         }
     }
     fun getAllMoves(color: Color): List<PieceMoves>{
-        return map { pos, piece ->
-            if(piece == null || piece.color != color) return@map null
-            PieceMoves(pos, piece.getMoves(pos, this))
+        return if(color != turn) listOf()
+        else map { pos, piece ->
+            if(piece == null || piece.color != color) null
+            else PieceMoves(pos, piece.getMoves(pos, this))
         }.flatten().filterNotNull()
+    }
+    fun getAllValidMoves(color: Color): List<PieceMoves>{
+        return getAllMoves(color).map {
+            PieceMoves(it.piece, it.moves.filter { newPos ->
+                !movePiece(it.piece, newPos).inCheck(color)
+            })
+        }
     }
     fun inCheck(color: Color): Boolean{
         var kingPos: Vec2? = null
@@ -62,8 +70,6 @@ data class ChessBoard(
             spaces = listOf(
                 listOf(Piece.Rook(Color.Black), Piece.Knight(Color.Black), Piece.Bishop(Color.Black), Piece.Queen(Color.Black), Piece.King(Color.Black), Piece.Bishop(Color.Black), Piece.Knight(Color.Black), Piece.Rook(Color.Black)),
                 List(8){ Piece.Pawn(Color.Black) },
-                List(8){ null },
-                List(8){ null },
                 List(8){ null },
                 List(8){ null },
                 List(8){ null },
@@ -102,25 +108,26 @@ sealed class Piece {
     abstract fun getMoves(position: Vec2, board: ChessBoard): List<Vec2>
 
 
+    @Serializable
     class Pawn(override val color: Color): Piece(){
         override fun getMoves(position: Vec2, board: ChessBoard): List<Vec2> {
             val r = mutableListOf<Vec2>()
             val forwardOnce = position + color.forward
-            if(forwardOnce in board && board[forwardOnce] != null){
+            if(forwardOnce in board && board[forwardOnce] == null){
                 r.add(forwardOnce)
                 if(
-                    (color == Color.White && position.y == 1) ||
-                    (color == Color.Black && position.y == 6)
+                    (color == Color.White && position.x == 6) ||
+                    (color == Color.Black && position.x == 1)
                 ){
                     val forwardTwice = forwardOnce + color.forward
                     if(forwardTwice in board && board[forwardTwice] == null)
                     r.add(forwardTwice)
                 }
             }
-            if(board[forwardOnce + left]?.isEnemy() == true){
+            if(forwardOnce + left in board && board[forwardOnce + left]?.isEnemy() == true){
                 r.add(forwardOnce + left)
             }
-            if(board[forwardOnce + right]?.isEnemy() == true){
+            if(forwardOnce + right in board && board[forwardOnce + right]?.isEnemy() == true){
                 r.add(forwardOnce + right)
             }
             return r.toList()
@@ -137,6 +144,7 @@ sealed class Piece {
         }
     }
 
+    @Serializable
     sealed class StraightMoving(): Piece(){
         protected abstract val direction: List<Vec2>
         override fun getMoves(position: Vec2, board: ChessBoard): List<Vec2> {
@@ -146,9 +154,9 @@ sealed class Piece {
                 while (toCheck in board){
                     val piece = board[toCheck]
                     when{
-                        piece == null -> r.add(toCheck)
-                        piece.isEnemy() -> { r.add(toCheck); continue }
-                        piece.isFriendly() -> continue
+                        piece == null -> { r.add(toCheck); toCheck += it }
+                        piece.isEnemy() -> { r.add(toCheck); break }
+                        piece.isFriendly() -> break
                     }
                 }
                 r.toList()
@@ -156,26 +164,31 @@ sealed class Piece {
         }
     }
 
+    @Serializable
     data class Knight(override val color: Color): StaticMoving() {
         override val moves: List<Vec2>
             get() = knightMoves
     }
 
+    @Serializable
     data class Bishop(override val color: Color): StraightMoving() {
         override val direction: List<Vec2>
             get() = bishopDirections
     }
 
+    @Serializable
     data class Rook(override val color: Color): StraightMoving() {
         override val direction: List<Vec2>
             get() = rookDirections
     }
 
+    @Serializable
     data class Queen(override val color: Color): StraightMoving() {
         override val direction: List<Vec2>
             get() = bishopDirections + rookDirections
     }
 
+    @Serializable
     data class King(override val color: Color): StaticMoving() {
         override val moves: List<Vec2>
             get() = bishopDirections + rookDirections
@@ -215,13 +228,13 @@ sealed class Piece {
 
 @Serializable
 enum class Color(val forward: Vec2){
-    White(Vec2(0, 1)),
-    Black(Vec2(0, -1));
+    White(Vec2(-1, 0)),
+    Black(Vec2(1, 0));
     fun opponentColor() = if(this == Black) White else Black
 }
 
-val left = Vec2(-1, 0)
-val right = Vec2(1, 0)
+val left = Vec2(0, 1)
+val right = Vec2(0, -1)
 
 val bishopDirections = listOf(
     Vec2(1, 1),
@@ -240,9 +253,4 @@ val knightMoves = rookDirections.flatMap {
     val forward = it + it
     val right = it.rotate90()
     listOf(forward + right, forward - right)
-}
-fun getMoves(board: ChessBoard, position: Vec2): List<Vec2> {
-    val piece = board[position] ?: return listOf()
-    return piece.getMoves(position, board)
-        .filter { board.movePiece(position, it).inCheck(board.turn) }
 }

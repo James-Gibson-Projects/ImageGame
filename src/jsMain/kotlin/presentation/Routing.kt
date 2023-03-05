@@ -1,6 +1,8 @@
 package presentation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import app.softwork.routingcompose.HashRouter
 import app.softwork.routingcompose.NavLink
 import app.softwork.routingcompose.Router
@@ -18,13 +20,19 @@ import presentation.views.*
 class AppRoot: KoinComponent {
     @Composable
     fun Root(){
+        val scope = rememberCoroutineScope()
         HashRouter("/login") {
             val router = Router.current
             route("/home") {
-                val websocket: WebSocket by inject()
-                websocket.onClose { router.navigate("/login") }
-                websocket.connect()
-                HomeView(FriendRequestsViewModel(), GameRequestViewModel())
+                val websocket: WebSocket = remember {
+                    val ws by inject<WebSocket>()
+                    ws.onClose { router.navigate("/login") }
+                    ws.connect()
+                    ws
+                }
+                val friendRequestsViewModel = remember { FriendRequestsViewModel() }
+                val gameRequestsViewModel = remember { GameRequestViewModel() }
+                HomeView(friendRequestsViewModel, gameRequestsViewModel, scope)
             }
             route("/register") {
                 val viewModel = RegistrationViewModel(router)

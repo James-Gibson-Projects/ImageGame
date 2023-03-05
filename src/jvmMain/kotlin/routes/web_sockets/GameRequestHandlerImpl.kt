@@ -3,9 +3,7 @@ package routes.web_sockets
 import domain.model.UserSession
 import domain.repo.GameRepo
 import io.ktor.server.websocket.*
-import model.messages.GameRequest
-import model.messages.GameResponse
-import model.messages.WebsocketRequest
+import model.messages.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -23,19 +21,20 @@ class GameRequestHandlerImpl : GameRequestHandler, KoinComponent {
             is GameRequest.Refresh -> {
                 val game = repo.getGameState(request.gameId)
                 val color = repo.getColor(game.id, session.username)
-                sendSerialized(GameResponse(game, game.getAllMoves(color), color))
+                val moves = game.getAllValidMoves(color)
+                sendSerialized<WebsocketResponse>(GameResponse(game, moves, color))
             }
             is GameRequest.MovePiece -> {
                 val game = repo.getGameState(request.gameId)
                 val color = repo.getColor(game.id, session.username)
-                val moves = game.getAllMoves(color)
+                val moves = game.getAllValidMoves(color)
                 if(request.to !in moves.first { it.piece == request.from }.moves) throw Exception("Invalid Move")
                 val newState = game.movePiece(request.from, request.to)
                 repo.setGameState(game.id, newState)
-                sendSerialized(GameResponse(newState, game.getAllMoves(color), color))
+                sendSerialized<WebsocketResponse>(GameResponse(newState, newState.getAllValidMoves(color), color))
                 connections[repo.getOtherUser(game.id, session.username)]!!
                     .webSocketSession
-                    .sendSerialized(GameResponse(newState, game.getAllMoves(color), color))
+                    .sendSerialized<WebsocketResponse>(GameResponse(newState, newState.getAllValidMoves(color.opponentColor()), color.opponentColor()))
             }
         }
     }

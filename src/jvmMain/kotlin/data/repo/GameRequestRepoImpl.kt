@@ -39,9 +39,9 @@ class GameRequestRepoImpl : GameRequestRepo, KoinComponent{
             throw NoIncomingInviteException()
         graph.deleteGameRequest(fromUsername, toUsername)
         return if(Random.nextBoolean()){
-            graph.createGame(fromUsername, toUsername).first()
+            graph.createGame(fromUsername, toUsername, List(20){ ('A' .. 'Z').random() }.joinToString("")).first()
         } else {
-            graph.createGame(toUsername, fromUsername).first()
+            graph.createGame(toUsername, fromUsername, List(20){ ('A' .. 'Z').random() }.joinToString("")).first()
         }
     }
 }

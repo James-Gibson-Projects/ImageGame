@@ -3,6 +3,7 @@ package presentation.views
 import androidx.compose.runtime.*
 import app.softwork.routingcompose.RouteBuilder
 import app.softwork.routingcompose.Router
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import model.messages.*
 import org.jetbrains.compose.web.dom.*
@@ -11,6 +12,7 @@ import presentation.components.DefaultTextField
 import presentation.components.GameInviteNotification
 import presentation.view_models.FriendRequestsViewModel
 import presentation.view_models.GameRequestViewModel
+import presentation.view_models.GameViewModel
 
 /*
 @Composable
@@ -30,20 +32,16 @@ fun HomeView(){
 @Composable
 fun RouteBuilder.HomeView(
     friendRequestsViewModel: FriendRequestsViewModel,
-    gameRequestViewModel: GameRequestViewModel
+    gameRequestViewModel: GameRequestViewModel,
+    scope: CoroutineScope
 ){
     Div(attrs = { classes("flex") }){
         NotificationOverlay(gameRequestViewModel)
         Div(attrs = { classes("flex-grow") }){
             route("/game"){
                 string {
-                    Div(attrs = { classes("grid", "grid-cols-8", "gap-0.5", "aspect-square") }) {
-                        (1..64).forEach {
-                            Div(attrs = { classes(if(it % 2 == 0) "bg-white" else "bg-black", "flex", "items-center", "justify-center") }){
-                                Text(it.toString())
-                            }
-                        }
-                    }
+                    val viewModel = remember { GameViewModel(it, scope).also { it.refresh() } }
+                    ChessBoardView(viewModel)
                 }
             }
         }
@@ -58,14 +56,11 @@ fun NotificationOverlay(viewModel: GameRequestViewModel){
     val notificationResponse by viewModel.gameInviteFlow.collectAsState(null)
     var notification: String? by remember { mutableStateOf(null) }
     val router = Router.current
-    LaunchedEffect(notificationResponse){
-        if(notificationResponse is GameInviteResponse.Received){
-            notification = (notificationResponse as GameInviteResponse.Received).from
-            delay(10_000)
-            notification = null
-        } else if (notificationResponse is GameInviteResponse.Started){
-            router.navigate("/home/game/${(notificationResponse as GameInviteResponse.Started).gameId}")
-        }
+    if(notificationResponse is GameInviteResponse.Received){
+        notification = (notificationResponse as GameInviteResponse.Received).from
+    } else if (notificationResponse is GameInviteResponse.Started) {
+        notification = null
+        router.navigate("/home/game/${(notificationResponse as GameInviteResponse.Started).gameId}")
     }
     notification?.let {
         GameInviteNotification(it, { viewModel.acceptRequest(it) }, {})

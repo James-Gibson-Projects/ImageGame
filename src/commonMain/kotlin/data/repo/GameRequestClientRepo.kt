@@ -1,10 +1,11 @@
 package data.repo
 
 import kotlinx.coroutines.flow.Flow
-import model.messages.GameInviteResponse
+import model.messages.GameResponse
+import model.messages.Vec2
 
 interface GameRequestClientRepo {
-    fun observeInvites(): Flow<GameInviteResponse>
-    suspend fun sendRequest(to: String)
-    suspend fun acceptRequest(from: String)
+    fun observeGameState(): Flow<GameResponse>
+    suspend fun refresh(gameId: String)
+    suspend fun movePiece(gameId: String, from: Vec2, to: Vec2)
 }

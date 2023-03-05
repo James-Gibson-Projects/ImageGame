@@ -1,23 +1,23 @@
 package presentation.view_models
 
-import data.websocket.WebSocket
+import data.repo.GameRequestClientRepo
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import model.messages.ChessBoard
-import model.messages.GameRequest
-import model.messages.GameResponse
 import model.messages.Vec2
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class GameViewModel(private val gameId: String): KoinComponent{
-    private val ws: WebSocket by inject()
-    val gameFlow = ws.observeResponses(GameResponse::class, GameRequest.Refresh(gameId))
-    private val scope = CoroutineScope(Dispatchers.Default)
+class GameViewModel(private val gameId: String, val scope: CoroutineScope): KoinComponent{
+    private val repo: GameRequestClientRepo by inject()
+    val piecesFlow = repo.observeGameState()
+    fun refresh(){
+        scope.launch {
+            repo.refresh(gameId)
+        }
+    }
     fun movePiece(from: Vec2, to: Vec2){
         scope.launch {
-            ws.sendRequest(GameRequest.MovePiece(gameId, from, to))
+            repo.movePiece(gameId, from, to)
         }
     }
 }
