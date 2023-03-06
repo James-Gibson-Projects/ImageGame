@@ -1,10 +1,9 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
-    kotlin("multiplatform") version "1.7.10"
-    kotlin("kapt") version "1.7.10"
-    kotlin("plugin.serialization") version "1.7.10"
-    id("org.jetbrains.compose") version "1.2.0"
+    kotlin("multiplatform") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
+    id("org.jetbrains.compose") version "1.2.1"
     application
 }
 
@@ -53,9 +52,9 @@ kotlin {
         }
     }
     sourceSets {
-        val commonMain by getting{
+        val commonMain by getting {
             dependencies{
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
                 implementation("io.insert-koin:koin-core:3.2.2")
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -64,7 +63,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
         }
-        val commonTest by getting{
+        val commonTest by getting {
             dependencies{
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:3.2.2")
@@ -100,8 +99,8 @@ kotlin {
 
             }
         }
-        val jvmTest by getting{
-            dependencies{
+        val jvmTest by getting {
+            dependencies {
                 implementation("io.ktor:ktor-server-test-host:$ktorVersion")
                 implementation("io.insert-koin:koin-test-junit4:3.2.2")
                 implementation("org.amshove.kluent:kluent:1.72")
@@ -111,8 +110,8 @@ kotlin {
             dependencies {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
-                implementation("app.softwork:routing-compose:0.2.7")
-                implementation("org.jetbrains.compose.web:web-svg-js:1.2.0")
+                implementation("app.softwork:routing-compose:0.2.10")
+                implementation("org.jetbrains.compose.web:web-svg-js:1.2.1")
 
 
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-extensions:1.0.1-pre.256-kotlin-1.5.31")
@@ -149,7 +148,13 @@ val jvmJarTask = tasks.getByName<Jar>("jvmJar") {
     val jsBrowserProductionWebpack = tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack")
     from(jsBrowserProductionWebpack.destinationDirectory.resolve(jsBrowserProductionWebpack.outputFileName))
 }
-
+// optionally, you can add a task to copy the production version of your JS bundle to a resources folder of your choice
+val copyTailwindConfig by tasks.registering(Copy::class) {
+    include("tailwind.config.js")
+    from("$rootDir")
+    into("$rootDir/build/js/packages/kotlinjs-tailwindcss")
+}
+tasks.getByName("jsBrowserProductionWebpack").dependsOn(copyTailwindConfig)
 tasks.getByName<JavaExec>("run") {
     dependsOn(jvmJarTask)
     classpath(jvmJarTask)

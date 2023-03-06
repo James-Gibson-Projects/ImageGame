@@ -1,0 +1,3 @@
+package routes.web_sockets
+
+interface GameRequestHandler: WebSocketHandler

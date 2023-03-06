@@ -14,4 +14,6 @@ val appModule = module {
     single<WebSocket>{ WebSocketImpl(defaultClient) }
     single<LoginRepo> { LoginRepoImpl() }
     single<FriendClientRepo> { FriendClientRepoImpl(get()) }
+    single<GameInviteRequestClientRepo> { GameInviteRequestClientRepoImpl(get()) }
+    single<GameRequestClientRepo> { GameRequestClientRepoImpl() }
 }

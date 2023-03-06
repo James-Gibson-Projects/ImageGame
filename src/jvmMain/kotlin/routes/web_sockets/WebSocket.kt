@@ -8,13 +8,16 @@ import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import model.messages.WebsocketRequest
+import org.eclipse.jetty.util.log.Log
 import org.koin.ktor.ext.inject
 
 val connections = mutableMapOf<String, Connection>()
 fun Application.configureWebsocket(){
     val friendRequests: FriendRequestHandler by inject()
+    val gameInviteRequests: GameInviteRequestHandler by inject()
+    val gameRequests: GameRequestHandler by inject()
     val userRepo: UserRepo by inject()
-    val handlers = listOf<WebSocketHandler>(friendRequests)
+    val handlers = listOf(friendRequests, gameRequests, gameInviteRequests)
     routing {
         authenticate("auth-session"){
             webSocket("/live") {

@@ -14,10 +14,10 @@ class LoginViewModel(private val router: Router): KoinComponent {
     val usernameState = mutableStateOf("")
     val passwordState = mutableStateOf("")
     val loginFailedState = mutableStateOf(false)
-    fun login() {
+    fun login(username: String, password: String) {
         scope.launch {
             try {
-                repo.login(usernameState.value, passwordState.value)
+                repo.login(username , password)
                 router.navigate("/home")
             } catch (e: Exception){
                 loginFailedState.value = true

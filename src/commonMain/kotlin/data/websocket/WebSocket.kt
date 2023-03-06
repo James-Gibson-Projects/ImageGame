@@ -8,4 +8,7 @@ import kotlin.reflect.KClass
 interface WebSocket {
     fun <T: WebsocketResponse>observeResponses(clazz: KClass<T>, connectMessage: WebsocketRequest? = null): Flow<T>
     suspend fun sendRequest(request: WebsocketRequest)
+    fun connect()
+    fun onClose(action: () -> Unit)
+
 }
