@@ -22,7 +22,7 @@ class GameRequestHandlerImpl : GameRequestHandler, KoinComponent {
                 val game = repo.getGameState(request.gameId)
                 val color = repo.getColor(game.id, session.username)
                 val moves = game.getAllValidMoves(color)
-                sendSerialized<WebsocketResponse>(GameResponse(game, moves, color))
+                sendSerialized<WebsocketResponse>(GameResponse.State(game, moves, color))
             }
             is GameRequest.MovePiece -> {
                 val game = repo.getGameState(request.gameId)
@@ -31,10 +31,10 @@ class GameRequestHandlerImpl : GameRequestHandler, KoinComponent {
                 if(request.to !in moves.first { it.piece == request.from }.moves) throw Exception("Invalid Move")
                 val newState = game.movePiece(request.from, request.to)
                 repo.setGameState(game.id, newState)
-                sendSerialized<WebsocketResponse>(GameResponse(newState, newState.getAllValidMoves(color), color))
+                sendSerialized<WebsocketResponse>(GameResponse.State(newState, newState.getAllValidMoves(color), color))
                 connections[repo.getOtherUser(game.id, session.username)]!!
                     .webSocketSession
-                    .sendSerialized<WebsocketResponse>(GameResponse(newState, newState.getAllValidMoves(color.opponentColor()), color.opponentColor()))
+                    .sendSerialized<WebsocketResponse>(GameResponse.State(newState, newState.getAllValidMoves(color.opponentColor()), color.opponentColor()))
             }
         }
     }

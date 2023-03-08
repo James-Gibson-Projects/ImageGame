@@ -8,7 +8,6 @@ import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import model.messages.WebsocketRequest
-import org.eclipse.jetty.util.log.Log
 import org.koin.ktor.ext.inject
 
 val connections = mutableMapOf<String, Connection>()
